@@ -75,7 +75,9 @@ View the wireframes on Excalidraw:
 
 ## ERD (Entity Relationship Diagram)
 
-![Budget Tracker ERD](./assets/budgetTrackerErd.png)
+<p align="center">
+  <img src="./assets/budgetTrackerErd.png" alt="Budget Tracker ERD" width="600">
+</p>
 
 ## Technologies Used
 

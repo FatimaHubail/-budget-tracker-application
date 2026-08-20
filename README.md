@@ -1,89 +1,88 @@
-<h1>
-  <span class="headline">New Project</span>
-  <span class="subhead">Setup</span>
-</h1>
+# Budget Tracker
 
-## Setup
+A full-stack CRUD application built with the MEN stack (MongoDB, Express, Node.js) that allows users to track income and expenses, filter and search transactions, and view spending broken down by category.
 
-Open your Terminal application and navigate to your projects directory:
+## Description
 
-## Cloning the Auth boilerplate
+Budget Tracker is a personal finance CRUD app where authenticated users can log income and expenses, filter and search through their transaction history, and view a category-based spending summary. Built as part of a General Assembly Software Engineering bootcamp project.
 
-This template uses the [`MEN Stack Auth Template`](https://github.com/Bahrain-SEB-15/SOLUTION-SESSION-AUTH-TEMPLATE) as starter code. Doing so allows us to have a connection established to our MongoDB Atlas, add functioning auth for our user model, and install some of the packages we will need for our app build.
+## User Stories
 
-Navigate to the [SOLUTION Session Auth Template](https://github.com/Bahrain-SEB-15/SOLUTION-SESSION-AUTH-TEMPLATE) and clone the repository to your machine and rename the folder to your desired project name by running the following command in your terminal.
+### Authentication
+- AAU, I can sign up with a username and password so I can create my own account.
+- AAU, I can log in so I can access my personal transactions.
+- AAU, I can log out so my session ends securely on shared devices.
 
-**Be sure to replace `<YOUR-PROJECT-NAME>` with your desired project name!**:
+### Transactions (CRUD)
+- As a logged-in user, I can view a list of all my transactions so I can see my financial activity at a glance.
+- As a logged-in user, I can add a new transaction details so I can record income or expenses.
+- As a logged-in user, I can view the details of a single transaction so I can review its full information.
+- As a logged-in user, I can edit an existing transaction so I can correct mistakes or update details.
+- As a logged-in user, I can delete a transaction so I can remove entries I no longer want tracked.
 
-```bash
-git clone https://github.com/Bahrain-SEB-15/SOLUTION-SESSION-AUTH-TEMPLATE.git <YOUR-PROJECT-NAME>
-```
+### Balance / Overview
+- As a logged-in user, I can see my current total balance (income minus expenses) on the main page so I know my financial standing at a glance.
+- As a logged-in user, I can distinguish income entries from expense entries visually (e.g. color or icon) so I can quickly scan my transaction list.
 
-Note by adding the `<YOUR-PROJECT-NAME>` argument we're cloning the specified repo into a directory called `<YOUR-PROJECT-NAME>` on our machines.
+### Filtering & Search
+- As a logged-in user, I can filter my transactions by category so I can see how much I've spent or earned in a specific area.
+- As a logged-in user, I can filter my transactions by type (income/expense) so I can focus on one side of my finances.
+- As a logged-in user, I can filter my transactions by date range (e.g. this month) so I can review a specific period.
+- As a logged-in user, I can search transactions using keywords related to transactions details so I can quickly find a specific entry.
 
-Next, `cd` into your renamed directory:
+### Category Breakdown
+- As a logged-in user, I can see a summary of total spending per category so I understand where my money goes.
+- As a logged-in user, I can see totals for the current month broken down by category so I can track monthly patterns.
 
-**Be sure to replace `<YOUR-PROJECT-NAME>` with your desired project name!**:
+### Access Control
+- AAU, I can only see and manage my own transactions (not other users') so my financial data stays private.
+- As a guest (not logged in), I am redirected to the login page when trying to access transaction routes so my data stays protected.
 
-```bash
-cd <YOUR-PROJECT-NAME>
-```
+---
 
-Finally, remove the existing `.git` information from this template:
+### (Extra Work)
 
-```bash
-rm -rf .git
-```
+#### Recurring Transactions
+- As a logged-in user, I can mark a transaction as recurring (e.g. monthly salary or subscription) so I don't have to re-enter it every period.
+- As a logged-in user, I can set the frequency of a recurring transaction (weekly/monthly/yearly) so it matches my real-life schedule.
+- As a logged-in user, I can view and cancel a recurring transaction so I can stop it when it's no longer relevant.
 
-> Removing the `.git` info is important as this is just a starter template provided by GA. You do not need the existing git history for this project.
+#### Shared Plans (Family/Business Groups)
 
-## GitHub setup
+**Group Management**
+- AAU, I can create a group (e.g. family or business) so I can manage shared finances with others.
+- As a group owner, I can share my group's unique invite code with others so they can join my group by entering it.
+- As an invited user, I can accept or decline a group invite so I control which groups I'm part of.
+- As a group owner, I can assign roles (admin/editor/viewer) to members so I can control what each person can do.
+- As a group owner, I can remove a member from the group so I can manage who has access.
+- AAU, I can leave a group I'm part of so I'm no longer tied to its shared finances.
 
-To add this project to GitHub, initialize a new Git repository:
+**Shared Transactions**
+- As a group member with editor/admin role, I can add a transaction to the group's shared budget so it's visible to everyone in the group.
+- As a group member, I can view all transactions added by anyone in the group so I have full visibility into shared spending.
+- As a group member with viewer role, I can see transactions but cannot add, edit, or delete them so my access stays read-only.
+- As a group admin, I can edit or delete any transaction in the group so I can correct errors made by others.
+- As a user, I can switch between my personal budget view and a group's shared budget view so I can manage both separately.
 
-```bash
-git init
-git add .
-git commit -m "init commit"
-```
+**Shared Budget Limits**
+- As a group admin, I can set a monthly budget limit per category for the whole group so we stay within a shared spending plan.
+- As a group member, I can see a warning when the group's category spending exceeds the shared limit so everyone is aware.
 
-Make a new repository on [GitHub](https://github.com/) for your project.
+## Wireframes
 
-Link your local project to your remote GitHub repo:
+View the wireframes on Excalidraw:
+[Budget Tracker Wireframes](https://excalidraw.com/#json=BATIOtFl_gLF5VbMxQXx5,cHIdm03kjTob2wUJv8Qztg)
 
-- use the second set of commands that appear on the empty repo to connect your local project to GitHub.
+## ERD (Entity Relationship Diagram)
 
-> 🚨 Do not copy the above command. It will not work. Your GitHub username will replace `<github-username>` (including the `<` and `>`) in the URL above.
+![Budget Tracker ERD](./assets/budgetTrackerErd.png)
 
-Open the project's folder in your code editor:
+## Technologies Used
 
-```bash
-code .
-```
-
-## Install dependencies
-
-Next, you will want to install all of the packages listed in `package.json`
-
-```bash
-npm i
-```
-
-## Create your .env
-
-Lastly, we want to create `MONGODB_URI` and `SESSION_SECRET` to hold values used in our auth logic.  `MONGODB_URI` will connect to your MongoDB Atlas connection string so you will need to establish one for this application.  `SESSION_SECRET` will aid in your auth session logic.
-
-Add a `.env` file to your application and add the following secret keys to your application:
-
-```text
-MONGODB_URI=
-SESSION_SECRET=
-```
-
-Start the server and you are ready for launch.
-
-```bash
-npm run dev
-```
-
-Happy Coding!
+- Node.js
+- Express
+- MongoDB / Mongoose
+- EJS
+- express-session / connect-mongo
+- Bcrypt
+- Method-Override

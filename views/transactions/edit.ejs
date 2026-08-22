@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit <%= transaction.title %> Transaction</title>
+</head>
+<body>
+    <%- include('../partials/_navbar.ejs') %>
+
+    <main class="form-page">
+        <a href="/transactions/<%= transaction._id %>" class="back-link">&larr; Back</a>
+
+        <h1>Edit Transaction</h1>
+
+        <form action="/transactions/<%= transaction._id %>?_method=PUT" method="post" class="transaction-form">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="<%= transaction.title %>" required>
+
+            <label for="description">Description</label>
+            <textarea name="description" id="description"><%= transaction.description || '' %></textarea>
+
+            <label for="amount">Amount</label>
+            <input type="number" name="amount" id="amount" step="0.01" min="0" value="<%= transaction.amount %>" required>
+
+            <label>Type</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="type" id="type-income" value="income" <%= transaction.type === 'income' ? 'checked' : '' %> required> Income
+                </label>
+                <label>
+                    <input type="radio" name="type" id="type-expense" value="expense" <%=transaction.type==='expense' ? 'checked' : ''
+                        %> required> Expense
+                </label>
+            </div>
+
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+                <option value="" disabled>Select a category</option>
+            </select>
+            
+            <div id="new-category-wrapper" style="display: none;">
+                <label for="newCategory">New Category Name</label>
+                <input type="text" id="newCategory" name="newCategory" placeholder="Enter new category"
+                    value="<%= transaction.category === 'other' && transaction.customCategory ? transaction.customCategory.name : '' %>">
+            </div>
+
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" value="<%= transaction.date.toISOString().split('T')[0] %>" required>
+            
+            <div class="form-actions">
+                <a href="/transactions/<%= transaction._id %>" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-save">Update Transaction</button>
+            </div>
+        </form>
+    </main>
+
+<script>
+    const categorySelect = document.getElementById('category');
+    const newCategoryWrapper = document.getElementById('new-category-wrapper');
+    const typeRadios = document.querySelectorAll('input[name="type"]');
+
+    const categoriesByType = {
+        income: ['salary', 'freelance', 'gift', 'investment'],
+        expense: ['food', 'groceries', 'transport', 'bills', 'rent', 'entertainment',
+            'shopping', 'health', 'education', 'travel', 'subscriptions']
+    };
+
+    const currentCategory = "<%= transaction.category %>";
+    const currentType = "<%= transaction.type %>";
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function populateCategories(type, selectedCategory) {
+        categorySelect.innerHTML = '';
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.disabled = true;
+        placeholder.textContent = 'Select a category';
+        categorySelect.appendChild(placeholder);
+
+        categoriesByType[type].forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = capitalize(cat);
+            if (cat === selectedCategory) option.selected = true;
+            categorySelect.appendChild(option);
+        });
+
+        const otherOption = document.createElement('option');
+        otherOption.value = 'other';
+        otherOption.textContent = 'Other';
+        if (selectedCategory === 'other') otherOption.selected = true;
+        categorySelect.appendChild(otherOption);
+
+        newCategoryWrapper.style.display = selectedCategory === 'other' ? 'block' : 'none';
+    }
+
+    populateCategories(currentType, currentCategory);
+
+    typeRadios.forEach(radio => {
+        radio.addEventListener('change', () => populateCategories(radio.value, ''));
+    });
+
+    categorySelect.addEventListener('change', () => {
+        newCategoryWrapper.style.display = categorySelect.value === 'other' ? 'block' : 'none';
+    });
+</script>
+    <%- include('../partials/_footer.ejs') %>
+</body>
+</html>

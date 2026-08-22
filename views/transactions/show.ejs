@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= transaction.title %>Transaction Details</title>
+</head>
+<body>
+    <%- include('../partials/_navbar.ejs') %>
+    
+        <main class="detail-page">
+    
+            <a href="/transactions" class="back-link">&larr; Back to Transactions</a>
+    
+            <div class="detail-card">
+    
+                <div class="detail-header">
+                    <h1>
+                        <%= transaction.title %>
+                    </h1>
+                    <p class="detail-amount <%= transaction.type === 'income' ? 'amount-income' : 'amount-expense' %>">
+                        <%= transaction.type==='income' ? '+' : '-' %>$<%= transaction.amount.toFixed(3) %>
+                    </p>
+                </div>
+    
+                <dl class="detail-list">
+                    <dt>Type</dt>
+                    <dd>
+                        <%= transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1) %>
+                    </dd>
+    
+                    <dt>Category</dt>
+                    <dd>
+                        <% if (transaction.category==='other' && transaction.customCategory) { %>
+                            <%= transaction.customCategory.name.charAt(0).toUpperCase() +
+                                transaction.customCategory.name.slice(1) %>
+                                <% } else { %>
+                                    <%= transaction.category.charAt(0).toUpperCase() + transaction.category.slice(1) %>
+                                        <% } %>
+                    </dd>
+    
+                    <dt>Date</dt>
+                    <dd>
+                        <%= transaction.date.toLocaleDateString('en-US', { year: 'numeric' , month: 'long' , day: 'numeric'
+                            }) %>
+                    </dd>
+    
+                    <dt>Description</dt>
+                    <dd>
+                        <%= transaction.description ? transaction.description : 'No additional notes' %>
+                    </dd>
+                </dl>
+    
+                <div class="detail-actions">
+                    <a href="/transactions/<%= transaction._id %>/edit" class="btn-edit">Edit</a>
+                    <form action="/transactions/<%= transaction._id %>?_method=DELETE" method="POST" class="delete-form">
+                        <button type="submit" class="btn-delete"
+                            onclick="return confirm('Are you sure you want to delete this transaction?');">Delete</button>
+                    </form>
+                </div>
+    
+            </div>
+    
+        </main>
+    
+        <%- include('../partials/_footer.ejs') %>
+
+</body>
+</html>

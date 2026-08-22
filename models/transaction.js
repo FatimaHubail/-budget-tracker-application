@@ -33,7 +33,6 @@ const transactionSchema = new mongoose.Schema({
   customCategory: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'OtherCategory',
-    required: true,
   },
 
   date: {

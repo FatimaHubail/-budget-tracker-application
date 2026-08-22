@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <%- include('../partials/_navbar.ejs') %>
+    
+        <main class="dashboard">
+    
+            <!-- ===== Transaction List ===== -->
+            <section class="transaction-list">
+                <div class="list-header">
+                    <h2>Transactions</h2>
+                    <a href="/transactions/new" class="btn-add">+ Add Transaction</a>
+                </div>
+    
+                <% if (transactions.length === 0) { %>
+                    <p class="empty-state">
+                        No transactions found. Try adjusting your filters or add a new transaction.
+                    </p>
+                    <% } else { %>
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% transactions.forEach(transaction=> { %>
+                                    <tr class="transaction-row">
+                                        <td>
+                                            <%= transaction.title %>
+                                        </td>
+                                        <td
+                                            class="<%= transaction.type === 'income' ? 'amount-income' : 'amount-expense' %>">
+                                            <%= transaction.type %>
+                                        </td>
+                                        <td>
+                                            <a href="/transactions/<%= transaction._id %>" class="btn-details">
+                                                View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                        <% } %>
+            </section>
+    
+        </main>
+    
+        <%- include('../partials/_footer.ejs') %>
+</body>
+</html>

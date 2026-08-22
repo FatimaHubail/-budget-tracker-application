@@ -2,14 +2,14 @@ const express = require('express');
 
 const router = express.Router({ mergeParams: true });
 
-const transactionCtrl = require('../controllers/authCtrl');
+const transactionsCtrl = require('../controllers/transactionsCtrl');
 
-router.get('', transactionCtrl.index);
-router.get('/new', transactionCtrl.new);
-router.post('', transactionCtrl.create);
-router.get('/:id', transactionCtrl.show);
-router.get('/:id/edit', transactionCtrl.edit);
-router.put('/:id', transactionCtrl.update);
-router.delete('/:id', transactionCtrl.delete);
+router.get('', transactionsCtrl.index);
+router.get('/new', transactionsCtrl.newTransaction);
+router.post('', transactionsCtrl.create);
+router.get('/:id', transactionsCtrl.show);
+router.get('/:id/edit', transactionsCtrl.edit);
+router.put('/:id', transactionsCtrl.update);
+router.delete('/:id', transactionsCtrl.deleteTransaction);
 
 module.exports = router;

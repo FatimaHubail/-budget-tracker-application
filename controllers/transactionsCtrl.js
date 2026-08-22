@@ -25,7 +25,8 @@ const processCustomCategory = async (category, newCategory, type, userId) => {
 // index route (dashboard)
 const index = async (req, res) => {
     try {
-        res.render('transactions/index.ejs');
+        const transactions = await Transaction.find({ user: req.session.user._id }).sort({ date: -1 });
+        res.render('transactions/index.ejs', {transactions});
     } catch (error) {
         console.log(error);
         res.redirect('/');

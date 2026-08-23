@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spend Breakdown</title>
+</head>
+
+<body>
+    <%- include('../partials/_navbar.ejs') %>
+
+        <main class="summary-page">
+
+            <div class="summary-header">
+                <h1>Spend Breakdown</h1>
+
+                <form method="GET" action="/transactions/summary" class="month-selector">
+                    <input type="month" name="month" value="<%= month %>">
+                    <button type="submit">View</button>
+                </form>
+            </div>
+
+            <!-- ===== Expenses by Category ===== -->
+            <section class="breakdown-section">
+                <h2>Expenses by Category</h2>
+
+                <% if (expenseBreakDown.length===0) { %>
+                    <p class="empty-state">No expenses recorded for this month.</p>
+                    <% } else { %>
+                        <ul class="breakdown-list">
+                            <% expenseBreakDown.forEach(entry=> { %>
+                                <li class="breakdown-item">
+                                    <div class="breakdown-label">
+                                        <span class="category-name">
+                                            <%= entry.category.charAt(0).toUpperCase() + entry.category.slice(1) %>
+                                        </span>
+                                        <span class="category-amount">$<%= entry.total.toFixed(3) %></span>
+                                    </div>
+                                    <div class="bar-track">
+                                        <div class="bar-fill expense-fill"
+                                            style="width: <%= entry.percentage.toFixed(1) %>%;"></div>
+                                    </div>
+                                    <span class="category-percentage">
+                                        <%= entry.percentage.toFixed(1) %>%
+                                    </span>
+                                </li>
+                                <% }) %>
+                        </ul>
+
+                        <p class="section-total">Total Expenses: $<%= totalExpense.toFixed(2) %>
+                        </p>
+                        <% } %>
+            </section>
+
+            <!-- ===== Income by Category ===== -->
+            <section class="breakdown-section">
+                <h2>Income by Category</h2>
+
+                <% if (incomeBreakDown.length===0) { %>
+                    <p class="empty-state">No income recorded for this month.</p>
+                    <% } else { %>
+                        <ul class="breakdown-list">
+                            <% incomeBreakDown.forEach(entry=> { %>
+                                <li class="breakdown-item">
+                                    <div class="breakdown-label">
+                                        <span class="category-name">
+                                            <%= entry.category.charAt(0).toUpperCase() + entry.category.slice(1) %>
+                                        </span>
+                                        <span class="category-amount">$<%= entry.total.toFixed(2) %></span>
+                                    </div>
+                                    <div class="bar-track">
+                                        <div class="bar-fill income-fill"
+                                            style="width: <%= entry.percentage.toFixed(1) %>%;"></div>
+                                    </div>
+                                    <span class="category-percentage">
+                                        <%= entry.percentage.toFixed(1) %>%
+                                    </span>
+                                </li>
+                                <% }) %>
+                        </ul>
+
+                        <p class="section-total">Total Income: $<%= totalIncome.toFixed(2) %>
+                        </p>
+                        <% } %>
+            </section>
+
+        </main>
+
+        <%- include('../partials/_footer.ejs') %>
+</body>
+
+</html>

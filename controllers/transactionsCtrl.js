@@ -165,7 +165,7 @@ const deleteTransaction = async (req, res) => {
 const summary = async (req, res) => {
     try {
         // specify summary month
-        const month = req.query.month || moment.format('YYYY-MM');
+        const month = req.query.month || moment().format('YYYY-MM');
         const { start, end } = getMonthRange(month);
 
         // query to find transactions within that month chosen by user

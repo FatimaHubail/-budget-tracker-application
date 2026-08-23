@@ -1,103 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <script src="/js/categoryProcessor.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Transaction</title>
 </head>
+
 <body>
     <%- include('../partials/_navbar.ejs') %>
-    <main class="form-page">
-        <a href="/transactions" class="back-link">&larr; Back</a>
+        <main class="form-page">
+            <a href="/transactions" class="back-link">&larr; Back</a>
 
-        <h1>New Transaction</h1>
+            <h1>New Transaction</h1>
 
-        <form action="/transactions" method="post" class="transaction-form">
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title" required>
+            <form action="/transactions" method="post" class="transaction-form" id="transaction-form">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" required>
 
-            <label for="description">Description</label>
-            <textarea name="description" id="description"></textarea>
+                <label for="description">Description</label>
+                <textarea name="description" id="description"></textarea>
 
-            <label for="amount">Amount</label>
-            <input type="number" id="amount" name="amount" step="0.01" min="0" required>
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" name="amount" step="0.01" min="0" required>
 
-            <label>Type</label>
-            <div class="radio-group">
-                <label><input type="radio" name="type" value="income" required>Income</label>
-                <label><input type="radio" name="type" value="expense" required>Expense</label>
-            </div>
+                <label>Type</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="type" value="income" required>Income</label>
+                    <label><input type="radio" name="type" value="expense" required>Expense</label>
+                </div>
 
-            <label for="category">Category</label>
-            <select name="category" id="category" required disabled>
-                <option value="" disabled selected>Select a type first</option> 
-            </select>
+                <label for="category-choice">Category</label>
+                <!-- this select is NOT submitted directly (no "category" name) -->
+                <select id="category-choice" required disabled>
+                    <option value="" disabled selected data-type="">Select a type first</option>
 
-            <div id="new-category-wrapper" style="display: none;">
-                <label for="newCategory">New Category Name</label>
-                <input type="text" id="newCategory" name="newCategory" placeholder="Enter new category">
-            </div>
+                    <!-- fixed income categories -->
+                    <option value="salary" data-type="income">Salary</option>
+                    <option value="freelance" data-type="income">Freelance</option>
+                    <option value="gift" data-type="income">Gift</option>
+                    <option value="investment" data-type="income">Investment</option>
 
-            <label for="date">Date</label>
-            <input type="date" id="date" name="date" required>
+                    <!-- fixed expense categories -->
+                    <option value="food" data-type="expense">Food</option>
+                    <option value="groceries" data-type="expense">Groceries</option>
+                    <option value="transport" data-type="expense">Transport</option>
+                    <option value="bills" data-type="expense">Bills</option>
+                    <option value="rent" data-type="expense">Rent</option>
+                    <option value="entertainment" data-type="expense">Entertainment</option>
+                    <option value="shopping" data-type="expense">Shopping</option>
+                    <option value="health" data-type="expense">Health</option>
+                    <option value="education" data-type="expense">Education</option>
+                    <option value="travel" data-type="expense">Travel</option>
+                    <option value="subscriptions" data-type="expense">Subscriptions</option>
 
-            <div class="form-actions">
-                <a href="/transactions" class="btn-cancel">Cancel</a>
-                <button type="submit" class="btn-save">Save Transaction</button>
-            </div>
-        </form>
-    </main>
+                    <!-- custom categories already saved by this user, rendered server-side -->
+                    <% customCategories.forEach(cat=> { %>
+                        <option value="<%= cat.name %>" data-type="<%= cat.type %>" data-custom="true">
+                            <%= cat.name.charAt(0).toUpperCase() + cat.name.slice(1) %>
+                        </option>
+                        <% }) %>
 
-    <script>
-        const categorySelect = document.getElementById('category');
-        const newCategoryWrapper = document.getElementById('new-category-wrapper');
-        const typeRadios = document.querySelectorAll('input[name="type"]');
+                            <!-- generic "other", always available, for adding a brand new one -->
+                            <option value="other" data-type="income">Other (new)</option>
+                            <option value="other" data-type="expense">Other (new)</option>
+                </select>
 
-        const categoriesByType = {
-                income: ['salary', 'freelance', 'gift', 'investment'],
-                expense: ['food', 'groceries', 'transport', 'bills', 'rent', 'entertainment',
-                    'shopping', 'health', 'education', 'travel', 'subscriptions']
-        };
+                <!-- hidden field actually submitted to the server -->
+                <input type="hidden" id="category" name="category" value="">
 
-         function capitalize(str) {
-                return str.charAt(0).toUpperCase() + str.slice(1);
-            }
+                <div id="new-category-wrapper" style="display: none;">
+                    <label for="newCategory">New Category Name</label>
+                    <input type="text" id="newCategory" name="newCategory" placeholder="Enter new category">
+                </div>
 
-            function populateCategories(type) {
-                categorySelect.innerHTML = '';
-                categorySelect.disabled = false;
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
 
-                const placeholder = document.createElement('option');
-                placeholder.value = '';
-                placeholder.disabled = true;
-                placeholder.selected = true;
-                placeholder.textContent = 'Select a category';
-                categorySelect.appendChild(placeholder);
+                <div class="form-actions">
+                    <a href="/transactions" class="btn-cancel">Cancel</a>
+                    <button type="submit" class="btn-save">Save Transaction</button>
+                </div>
+            </form>
+        </main>
 
-                categoriesByType[type].forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat;
-                    option.textContent = capitalize(cat);
-                    categorySelect.appendChild(option);
-                });
+        <script src="/js/transactionForm.js"></script>
 
-                const otherOption = document.createElement('option');
-                otherOption.value = 'other';
-                otherOption.textContent = 'Other';
-                categorySelect.appendChild(otherOption);
-
-                newCategoryWrapper.style.display = 'none';
-            }
-
-            typeRadios.forEach(radio => {
-                radio.addEventListener('change', () => populateCategories(radio.value));
-            });
-
-            categorySelect.addEventListener('change', () => {
-                newCategoryWrapper.style.display = categorySelect.value === 'other' ? 'block' : 'none';
-            });
-    </script>
-
-    <%- include('../partials/_footer.ejs') %>
+        <%- include('../partials/_footer.ejs') %>
 </body>
+
 </html>

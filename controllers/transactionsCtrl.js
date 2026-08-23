@@ -36,7 +36,8 @@ const index = async (req, res) => {
 // route to render the 'add transaction' form 
 const newTransaction = async (req, res) => {
     try {
-        res.render('transactions/new.ejs');
+        const customCategories = await OtherCategory.find({ user: req.session.user._id });
+        res.render('transactions/new.ejs', {customCategories});
     } catch (error) {
         console.log(error);
         res.redirect('/');
@@ -70,7 +71,7 @@ const create = async (req, res) => {
 
 const show = async (req, res) => {
     try {
-        const transaction = await Transaction.findById(req.params.id); 
+        const transaction = await Transaction.findById(req.params.id).populate('customCategory'); 
 
         if (!transaction || transaction.user.toString() !== req.session.user._id) {
             return res.redirect('/transactions');
@@ -87,12 +88,13 @@ const show = async (req, res) => {
 const edit = async (req, res) => {
     try {
         const transaction = await Transaction.findById(req.params.id);
+        const customCategories = await OtherCategory.find({ user: req.session.user._id });
 
         if (!transaction || transaction.user.toString() !== req.session.user._id) {
             return res.redirect('/transactions');
         }
 
-        res.render('transactions/edit.ejs', { transaction });
+        res.render('transactions/edit.ejs', { transaction, customCategories });
     } catch (error) {
         console.log(error);
         res.redirect('/');

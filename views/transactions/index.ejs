@@ -9,15 +9,39 @@
     <%- include('../partials/_navbar.ejs') %>
     
         <main class="dashboard">
-    
+            <!-- ===== Overview Data Cards ===== -->
+             <section class="balance-cards">
+                <div class="card balance">
+                    <h3>Balance</h3>
+                    <p class="amount"><%= balance.toFixed(3) %></p>
+                </div>
+
+                <div class="card income">
+                    <h3>Income</h3>
+                    <p class="amount">
+                        <%= income.toFixed(3) %>
+                    </p>
+                </div>
+
+                <div class="card expense">
+                    <h3>Expenses</h3>
+                    <p class="amount">
+                        <%= expense.toFixed(3) %>
+                    </p>
+                </div>
+             </section>
+
             <!-- ===== Transaction List ===== -->
             <section class="transaction-list">
                 <div class="list-header">
                     <h2>Transactions</h2>
                     <a href="/transactions/new" class="btn-add">+ Add Transaction</a>
                 </div>
+
+                <!-- ===== Filters + Search ===== -->
+                <%- include('../partials/_filterBar.ejs', {query}) %>
     
-                <% if (transactions.length === 0) { %>
+                <% if (filteredTransactions.length === 0) { %>
                     <p class="empty-state">
                         No transactions found. Try adjusting your filters or add a new transaction.
                     </p>
@@ -31,7 +55,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% transactions.forEach(transaction=> { %>
+                                <% filteredTransactions.forEach(transaction=> { %>
                                     <tr class="transaction-row">
                                         <td>
                                             <%= transaction.title %>

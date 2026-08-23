@@ -1,6 +1,3 @@
-// public/js/transactionForm.js
-// Shared logic for the New and Edit Transaction forms
-
 document.addEventListener('DOMContentLoaded', () => {
     const categorySelect = document.getElementById('category-choice');
     const hiddenCategoryInput = document.getElementById('category');

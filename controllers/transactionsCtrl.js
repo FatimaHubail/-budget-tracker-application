@@ -1,32 +1,54 @@
 const User = require('../models/user.js');
 const Transaction = require('../models/transaction.js');
 const OtherCategory = require('../models/otherCategory.js');
-
-// function for processing and validating the custom category data during creation/updating
-const processCustomCategory = async (category, newCategory, type, userId) => {
-    if (category !== 'other' || !newCategory) {
-        return null;
-    }
-
-    // remove extra spaces and convert tp lower case
-    const cleanName = newCategory.trim().toLowerCase();
-
-    // find if the custom category already added before for this user
-    let otherCategory = await OtherCategory.findOne({ name: cleanName, type, user: userId });
-
-    // doesn't exist before - add to db 
-    if (!otherCategory) {
-        otherCategory = await OtherCategory.create({ name: cleanName, type, user: userId });
-    }
-
-    return otherCategory._id;
-};
+const moment = require('moment');
+const {
+    processCustomCategory,
+    getMonthRange,
+    groupTransactionsByCategory,
+    buildBreakdown
+} = require('../utils/transactionHelpers.js');
 
 // index route (dashboard)
 const index = async (req, res) => {
     try {
-        const transactions = await Transaction.find({ user: req.session.user._id }).sort({ date: -1 });
-        res.render('transactions/index.ejs', {transactions});
+        const allTransactions = await Transaction.find({ user: req.session.user._id }).sort({date: -1}); 
+
+        // Calculating balance, expenses, and income
+        let income = 0;
+        let expense = 0;
+        let balance = 0;
+
+        allTransactions.forEach(transaction => {
+            if (transaction.type === 'income') {
+                income += transaction.amount;
+            } else if (transaction.type === 'expense') {
+                expense += transaction.amount;
+            }
+        });
+
+        balance = income - expense;
+
+        // filtering transactions
+        const filter = { user: req.session.user._id };
+
+        if (req.query.category) {
+            filter.category = req.query.category;
+        }
+
+        if (req.query.type) {
+            filter.type = req.query.type;
+        }
+
+        if (req.query.month) {
+            const { start, end } = getMonthRange(req.query.month);
+            filter.date = { $gte: start, $lte: end };
+        }
+
+        const filteredTransactions = await Transaction.find(filter).sort({date: -1});
+
+
+        res.render('transactions/index.ejs', {filteredTransactions, income, expense, balance, query:req.query});
     } catch (error) {
         console.log(error);
         res.redirect('/');
@@ -140,6 +162,41 @@ const deleteTransaction = async (req, res) => {
     }
 };
 
+const summary = async (req, res) => {
+    try {
+        // specify summary month
+        const month = req.query.month || moment.format('YYYY-MM');
+        const { start, end } = getMonthRange(month);
+
+        // query to find transactions within that month chosen by user
+        const transactions = await Transaction.find({
+            user: req.session.user._id,
+            date: { $gte: start, $lte: end }
+        }).populate('customCategory');
+
+        // calc totals for each category + total income/expenses
+        const { incomeTotals, expenseTotals, totalIncome, totalExpense } = groupTransactionsByCategory(transactions);
+
+        // calculate percentage for each income category
+        const incomeBreakDown = buildBreakdown(incomeTotals, totalIncome);
+
+        // calculate percentage for each expense category
+        const expenseBreakDown = buildBreakdown(expenseTotals, totalExpense);
+
+        res.render('transactions/summary.ejs', {
+            month,
+            incomeBreakDown,
+            expenseBreakDown,
+            totalIncome,
+            totalExpense,
+        });
+        
+    } catch (error) {
+        console.log(error);
+        res.redirect('/transactions');  
+    }
+};
+
 
 module.exports = {
     index,
@@ -149,4 +206,5 @@ module.exports = {
     deleteTransaction,
     edit,
     update,
+    summary,
 };

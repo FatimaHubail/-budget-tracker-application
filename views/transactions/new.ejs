@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <script src="/js/categoryProcessor.js"></script>
+    <script defer src="/js/categoryProcessor.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Transaction</title>
@@ -32,7 +32,6 @@
                 </div>
 
                 <label for="category-choice">Category</label>
-                <!-- this select is NOT submitted directly (no "category" name) -->
                 <select id="category-choice" required disabled>
                     <option value="" disabled selected data-type="">Select a type first</option>
 
@@ -55,19 +54,19 @@
                     <option value="travel" data-type="expense">Travel</option>
                     <option value="subscriptions" data-type="expense">Subscriptions</option>
 
-                    <!-- custom categories already saved by this user, rendered server-side -->
+                    <!-- custom categories already saved by this user -->
                     <% customCategories.forEach(cat=> { %>
                         <option value="<%= cat.name %>" data-type="<%= cat.type %>" data-custom="true">
                             <%= cat.name.charAt(0).toUpperCase() + cat.name.slice(1) %>
                         </option>
                         <% }) %>
 
-                            <!-- generic "other", always available, for adding a brand new one -->
-                            <option value="other" data-type="income">Other (new)</option>
-                            <option value="other" data-type="expense">Other (new)</option>
+                            <!-- generic "other", always available, for adding new one -->
+                            <option value="other" data-type="income">Other</option>
+                            <option value="other" data-type="expense">Other</option>
                 </select>
 
-                <!-- hidden field actually submitted to the server -->
+                <!-- hidden field submitted to the server -->
                 <input type="hidden" id="category" name="category" value="">
 
                 <div id="new-category-wrapper" style="display: none;">
@@ -84,8 +83,6 @@
                 </div>
             </form>
         </main>
-
-        <script src="/js/transactionForm.js"></script>
 
         <%- include('../partials/_footer.ejs') %>
 </body>

@@ -1,0 +1,35 @@
+<section class="filter-bar">
+    <form method="GET" action="/transactions">
+        <select name="category">
+            <option value="">All Categories</option>
+            <option value="food" <%= query.category==='food' ? 'selected' : '' %>>Food</option>
+            <option value="groceries" <%= query.category==='groceries' ? 'selected' : '' %>>Groceries</option>
+            <option value="transport" <%= query.category==='transport' ? 'selected' : '' %>>Transport</option>
+            <option value="bills" <%= query.category==='bills' ? 'selected' : '' %>>Bills</option>
+            <option value="rent" <%= query.category==='rent' ? 'selected' : '' %>>Rent</option>
+            <option value="entertainment" <%= query.category==='entertainment' ? 'selected' : '' %>>Entertainment</option>
+            <option value="shopping" <%= query.category==='shopping' ? 'selected' : '' %>>Shopping</option>
+            <option value="health" <%= query.category==='health' ? 'selected' : '' %>>Health</option>
+            <option value="education" <%= query.category==='education' ? 'selected' : '' %>>Education</option>
+            <option value="travel" <%= query.category==='travel' ? 'selected' : '' %>>Travel</option>
+            <option value="subscriptions" <%= query.category==='subscriptions' ? 'selected' : '' %>>Subscriptions
+            </option>
+            <option value="salary" <%= query.category==='salary' ? 'selected' : '' %>>Salary</option>
+            <option value="freelance" <%= query.category==='freelance' ? 'selected' : '' %>>Freelance</option>
+            <option value="gift" <%= query.category==='gift' ? 'selected' : '' %>>Gift</option>
+            <option value="investment" <%= query.category==='investment' ? 'selected' : '' %>>Investment</option>
+            <option value="other" <%= query.category==='other' ? 'selected' : '' %>>Other</option>
+        </select>
+
+        <select name="type">
+            <option value="">All Types</option>
+            <option value="income" <%= query.type==='income' ? 'selected' : '' %>>Income</option>
+            <option value="expense" <%= query.type==='expense' ? 'selected' : '' %>>Expense</option>
+        </select>
+
+        <input type="month" name="month" value="<%= query.month || '' %>">
+
+        <button type="submit">Filter</button>
+        <a href="/transactions" class="clear-link">Clear filters</a>
+    </form>
+</section>

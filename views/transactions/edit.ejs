@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <script src="/js/categoryProcessor.js"></script>
+    <script defer src="/js/categoryProcessor.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit <%= transaction.title %> Transaction</title>
@@ -43,7 +43,6 @@
                 </div>
 
                 <label for="category-choice">Category</label>
-                <!-- this select is NOT submitted directly (no "category" name) -->
                 <select id="category-choice" required>
                     <option value="" disabled data-type="">Select a category</option>
 
@@ -117,8 +116,6 @@
                 </div>
             </form>
         </main>
-
-        <script src="/js/transactionForm.js"></script>
 
         <%- include('../partials/_footer.ejs') %>
 </body>

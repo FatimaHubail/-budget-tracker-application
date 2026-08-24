@@ -35,7 +35,7 @@
                                         <span class="category-name">
                                             <%= entry.category.charAt(0).toUpperCase() + entry.category.slice(1) %>
                                         </span>
-                                        <span class="category-amount">$<%= entry.total.toFixed(3) %></span>
+                                        <span class="category-amount"><%= entry.total.toFixed(3) %></span>
                                     </div>
                                     <div class="bar-track">
                                         <div class="bar-fill expense-fill"
@@ -48,7 +48,7 @@
                                 <% }) %>
                         </ul>
 
-                        <p class="section-total">Total Expenses: $<%= totalExpense.toFixed(2) %>
+                        <p class="section-total">Total Expenses: <%= totalExpense.toFixed(2) %>
                         </p>
                         <% } %>
             </section>
@@ -67,7 +67,7 @@
                                         <span class="category-name">
                                             <%= entry.category.charAt(0).toUpperCase() + entry.category.slice(1) %>
                                         </span>
-                                        <span class="category-amount">$<%= entry.total.toFixed(2) %></span>
+                                        <span class="category-amount"><%= entry.total.toFixed(2) %></span>
                                     </div>
                                     <div class="bar-track">
                                         <div class="bar-fill income-fill"
@@ -80,7 +80,7 @@
                                 <% }) %>
                         </ul>
 
-                        <p class="section-total">Total Income: $<%= totalIncome.toFixed(2) %>
+                        <p class="section-total">Total Income: <%= totalIncome.toFixed(2) %>
                         </p>
                         <% } %>
             </section>

@@ -46,6 +46,12 @@ const transactionSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+
+  group: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group',
+    default: null,
+  },
 });
 
 // initialize the model

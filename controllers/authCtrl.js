@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const validator = require('validator');
 
 const SALT_ROUDS = 10;
 
@@ -11,7 +12,19 @@ const signup = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    // verify if the username alrady exists
+    // verify if the email already exists
+    const emailInDatabase = await User.findOne({ email: req.body.email });
+    // if the email exists send error msg
+    if (emailInDatabase) {
+      return res.send('Invalid input');
+    }
+
+    // verify if email is on the correct format
+    if (!validator.isEmail(req.body.email)) {
+      return res.send('Invalid input');
+    }
+
+    // verify if the username already exists
     const userInDatabase = await User.findOne({ username: req.body.username });
     // if the user exists send error msg
     if (userInDatabase) {
@@ -31,6 +44,7 @@ const register = async (req, res) => {
 
     req.session.user = {
       username: user.username,
+      email: user.email,
       _id: user._id,
     };
     // redirect to homepage
@@ -48,7 +62,7 @@ const signin = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const userInDatabase = await User.findOne({ username: req.body.username });
+  const userInDatabase = await User.findOne({ email: req.body.email });
 
   // only allow users that exist to login
   if (!userInDatabase) {
@@ -64,7 +78,7 @@ const login = async (req, res) => {
   // Avoid storing the password, even in hashed format, in the session
   // If there is other data you want to save to `req.session.user`, do so here!
   req.session.user = {
-    username: userInDatabase.username,
+    email: userInDatabase.email,
     _id: userInDatabase._id,
   };
 

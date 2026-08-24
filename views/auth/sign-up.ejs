@@ -8,6 +8,9 @@
   <body>
     <h1>Create a new account!</h1>
     <form action="/auth/sign-up" method="POST">
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email" required>
+      
       <label for="username">Username:</label>
       <input type="text" name="username" id="username" required />
 

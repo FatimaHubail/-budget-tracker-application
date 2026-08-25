@@ -17,8 +17,8 @@ router.get('/:id', groupsCtrl.show);
 router.get('/:id/transactions/new', groupsCtrl.addTransaction);
 router.post('/:id/transactions', groupsCtrl.createTransaction);
 router.get('/:id/transactions/:transactionId', groupsCtrl.showTransaction);
-// router.get('/:id/transactions/:transactionId/edit', groupsCtrl.editTransaction);
-// router.put('/:id/transactions/:transactionId', groupsCtrl.updateTransaction);
-// router.delete('/:id/transactions/:transactionId', groupsCtrl.deleteTransaction);
+router.get('/:id/transactions/:transactionId/edit', groupsCtrl.editTransaction);
+router.put('/:id/transactions/:transactionId', groupsCtrl.updateTransaction);
+router.delete('/:id/transactions/:transactionId', groupsCtrl.deleteTransaction);
 
 module.exports = router;

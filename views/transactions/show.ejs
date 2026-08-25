@@ -80,10 +80,10 @@
                                 <a href="/groups/<%= group._id %>/transactions/<%= transaction._id %>/edit"
                                     class="btn-edit">Edit</a>
 
-                                <% if (userRole==='admin' ) { %>
-                                    <form
-                                        action="/groups/<%= group._id %>/transactions/<%= transaction._id %>?_method=DELETE"
-                                        method="POST" class="delete-form">
+                                <% if (group && (userRole==='admin' || transaction.user.toString()===userId)) { %>
+                                    <a href="/groups/<%= group._id %>/transactions/<%= transaction._id %>/edit" class="btn-edit">Edit</a>
+                                    <form action="/groups/<%= group._id %>/transactions/<%= transaction._id %>?_method=DELETE" method="POST"
+                                        class="delete-form">
                                         <button type="submit" class="btn-delete"
                                             onclick="return confirm('Are you sure you want to delete this transaction?');">Delete</button>
                                     </form>

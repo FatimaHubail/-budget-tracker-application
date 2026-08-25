@@ -99,7 +99,7 @@ const show = async (req, res) => {
             return res.redirect('/transactions');
         }
 
-        res.render('transactions/show.ejs', { transaction });
+        res.render('transactions/show.ejs', { transaction, group: null });
     } catch (error) {
         console.log(error);
         res.redirect('/transactions');
@@ -116,7 +116,7 @@ const edit = async (req, res) => {
             return res.redirect('/transactions');
         }
 
-        res.render('transactions/edit.ejs', { transaction, customCategories });
+        res.render('transactions/edit.ejs', { transaction, customCategories, group: null });
     } catch (error) {
         console.log(error);
         res.redirect('/');

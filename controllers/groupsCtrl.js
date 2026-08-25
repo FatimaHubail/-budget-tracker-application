@@ -10,6 +10,11 @@ const {
     groupTransactionsByCategory,
     buildBreakdown
 } = require('../utils/transactionHelpers.js');
+const {
+    getGroupAndMembership,
+    getGroupTransaction,
+    canModifyTransaction
+} = require('../utils/groupHelpers.js');
 
 // index route (groups list)
 const index = async (req, res) => {
@@ -171,23 +176,20 @@ const createTransaction = async (req, res) => {
 
 const showTransaction = async (req, res) => {
     try {
-        const group = await Group.findById(req.params.id);
-
-        const membership = group.members.find(m => m.user.toString() === req.session.user._id);
-        if (!membership) {
+        const result = await getGroupAndMembership(req.params.id, req.session.user._id);
+        if (!result) {
             return res.redirect('/groups');
         }
-        const userRole = membership.role;
+        const { group, membership } = result;
 
-        const transaction = await Transaction.findById(req.params.transactionId)
-            .populate('customCategory')
-            .populate('user');
-
-        if (!transaction || transaction.group.toString() !== group._id.toString()) {
+        const transaction = await getGroupTransaction(group._id, req.params.transactionId);
+        if (!transaction) {
             return res.redirect(`/groups/${group._id}`);
         }
 
-        res.render('transactions/show.ejs', { transaction, group, userRole });
+        res.render('transactions/show.ejs', {
+            transaction, group, userRole: membership.role, userId: req.session.user._id
+        });
     } catch (error) {
         console.log(error);
         res.redirect('/groups');
@@ -196,25 +198,19 @@ const showTransaction = async (req, res) => {
 
 const editTransaction = async (req, res) => {
     try {
-        const group = await Group.findById(req.params.id);
-
-        const membership = group.members.find(m => m.user.toString() === req.session.user._id);
-        if (!membership) {
+        const result = await getGroupAndMembership(req.params.id, req.session.user._id);
+        if (!result) {
             return res.redirect('/groups');
         }
-        const userRole = membership.role;
+        const { group, membership } = result;
 
-        const transaction = await Transaction.findById(req.params.transactionId).populate('customCategory');
+        const transaction = await getGroupTransaction(group._id, req.params.transactionId);
 
-        if (!transaction || transaction.group.toString() !== group._id.toString()) {
+        if (!transaction) {
             return res.redirect(`/groups/${group._id}`);
         }
 
-        // allowed if: admin (can edit anyone's), OR the person who created this specific transaction
-        const isCreator = transaction.user.toString() === req.session.user._id;
-        const canEdit = userRole === 'admin' || isCreator;
-
-        if (!canEdit) {
+        if (!canModifyTransaction(transaction, membership, req.session.user._id)) {
             return res.redirect(`/groups/${group._id}/transactions/${transaction._id}`);
         }
 
@@ -230,23 +226,20 @@ const editTransaction = async (req, res) => {
 
 const updateTransaction = async (req, res) => {
     try {
-        const group = await Group.findById(req.params.id);
-
-        const membership = group.members.find(m => m.user.toString() === req.session.user._id);
-        if (!membership) {
+        const result = await getGroupAndMembership(req.params.id, req.session.user._id);
+        if (!result) {
             return res.redirect('/groups');
         }
+        const { group, membership } = result;
 
-        const transaction = await Transaction.findById(req.params.transactionId);
+    
+        const transaction = await getGroupTransaction(group._id, req.params.transactionId);
 
-        if (!transaction || transaction.group.toString() !== group._id.toString()) {
+        if (!transaction) {
             return res.redirect(`/groups/${group._id}`);
         }
 
-        const isCreator = transaction.user.toString() === req.session.user._id;
-        const canEdit = membership.role === 'admin' || isCreator;
-
-        if (!canEdit) {
+        if (!canModifyTransaction(transaction, membership, req.session.user._id)) {
             return res.redirect(`/groups/${group._id}/transactions/${transaction._id}`);
         }
 
@@ -265,23 +258,20 @@ const updateTransaction = async (req, res) => {
 
 const deleteTransaction = async (req, res) => { 
     try {
-        const group = await Group.findById(req.params.id);
-
-        const membership = group.members.find(m => m.user.toString() === req.session.user._id);
-        if (!membership) {
+        const result = await getGroupAndMembership(req.params.id, req.session.user._id);
+        if (!result) {
             return res.redirect('/groups');
         }
+        const { group, membership } = result;
 
-        const transaction = await Transaction.findById(req.params.transactionId);
 
-        if (!transaction || transaction.group.toString() !== group._id.toString()) {
+        const transaction = await getGroupTransaction(group._id, req.params.transactionId);
+
+        if (!transaction) {
             return res.redirect(`/groups/${group._id}`);
         }
 
-        const isCreator = transaction.user.toString() === req.session.user._id;
-        const canDelete = membership.role === 'admin' || isCreator;
-
-        if (!canDelete) {
+        if (!canModifyTransaction(transaction, membership, req.session.user._id)) {
             return res.redirect(`/groups/${group._id}/transactions/${transaction._id}`);
         }
 

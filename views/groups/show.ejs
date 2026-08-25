@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= group.name %>
+    </title>
+</head>
+
+<body>
+    <%- include('../partials/_navbar.ejs') %>
+
+        <main class="group-detail-page">
+
+            <a href="/groups" class="back-link">&larr; Back to Groups</a>
+
+            <!-- ===== Group Header ===== -->
+            <div class="group-header">
+                <div>
+                    <h1>
+                        <%= group.name %>
+                    </h1>
+                    <p class="group-meta">Owner: <%= group.owner.username %>
+                    </p>
+                    <% if (group.budgetLimit) { %>
+                        <p class="group-meta">Monthly Budget Limit: $<%= group.budgetLimit.toFixed(2) %>
+                        </p>
+                        <% } %>
+                </div>
+
+                <% if (userRole==='admin' ) { %>
+                    <a href="/groups/<%= group._id %>/members/new" class="btn-add">+ Add Member</a>
+                    <% } %>
+            </div>
+
+            <!-- ===== Members List ===== -->
+            <section class="members-section">
+                <h2>Members (<%= group.members.length %>)</h2>
+                <ul class="members-list">
+                    <% group.members.forEach(member=> { %>
+                        <li class="member-item">
+                            <span>
+                                <%= member.user.username %>
+                            </span>
+                            <span class="member-role">
+                                <%= member.role.charAt(0).toUpperCase() + member.role.slice(1) %>
+                            </span>
+                        </li>
+                        <% }) %>
+                </ul>
+            </section>
+
+            <!-- ===== Group Transactions ===== -->
+            <section class="transaction-list">
+                <div class="list-header">
+                    <h2>Group Transactions</h2>
+                    <% if (userRole==='admin' || userRole==='editor' ) { %>
+                        <a href="/groups/<%= group._id %>/transactions/new" class="btn-add">+ Add Transaction</a>
+                        <% } %>
+                </div>
+
+                <% if (transactions.length===0) { %>
+                    <p class="empty-state">No transactions in this group yet.</p>
+                    <% } else { %>
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Added By</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% transactions.forEach(transaction=> { %>
+                                    <tr class="transaction-row">
+                                        <td>
+                                            <%= transaction.title %>
+                                        </td>
+                                        <td
+                                            class="<%= transaction.type === 'income' ? 'amount-income' : 'amount-expense' %>">
+                                            <%= transaction.type %>
+                                        </td>
+                                        <td>
+                                            <%= transaction.user ? transaction.user.username : '—' %>
+                                        </td>
+                                        <td>
+                                            <a href="/groups/<%= group._id %>/transactions/<%= transaction._id %>"
+                                                class="btn-details">
+                                                View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                        <% } %>
+            </section>
+
+        </main>
+
+        <%- include('../partials/_footer.ejs') %>
+</body>
+
+</html>

@@ -59,7 +59,7 @@ const index = async (req, res) => {
 const newTransaction = async (req, res) => {
     try {
         const customCategories = await OtherCategory.find({ user: req.session.user._id });
-        res.render('transactions/new.ejs', {customCategories});
+        res.render('transactions/new.ejs', {customCategories, group: null});
     } catch (error) {
         console.log(error);
         res.redirect('/');

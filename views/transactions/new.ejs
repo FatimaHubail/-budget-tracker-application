@@ -2,87 +2,92 @@
 <html lang="en">
 
 <head>
-    <script defer src="/js/categoryProcessor.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Transaction</title>
+    <title>New Transaction</title>
 </head>
 
 <body>
     <%- include('../partials/_navbar.ejs') %>
         <main class="form-page">
-            <a href="/transactions" class="back-link">&larr; Back</a>
+
+            <a href="<%= group ? `/groups/${group._id}` : '/transactions' %>" class="back-link">&larr; Back</a>
 
             <h1>New Transaction</h1>
 
-            <form action="/transactions" method="post" class="transaction-form" id="transaction-form">
-                <label for="title">Title</label>
-                <input type="text" id="title" name="title" required>
+            <% if (group) { %>
+                <p class="form-subtitle">Adding to <strong>
+                        <%= group.name %>
+                    </strong></p>
+                <% } %>
 
-                <label for="description">Description</label>
-                <textarea name="description" id="description"></textarea>
+                    <form action="<%= group ? `/groups/${group._id}/transactions` : '/transactions' %>" method="post"
+                        class="transaction-form" id="transaction-form">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" name="title" required>
 
-                <label for="amount">Amount</label>
-                <input type="number" id="amount" name="amount" step="0.001" min="0" required>
+                        <label for="description">Description</label>
+                        <textarea name="description" id="description"></textarea>
 
-                <label>Type</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="type" value="income" required>Income</label>
-                    <label><input type="radio" name="type" value="expense" required>Expense</label>
-                </div>
+                        <label for="amount">Amount</label>
+                        <input type="number" id="amount" name="amount" step="0.01" min="0" required>
 
-                <label for="category-choice">Category</label>
-                <select id="category-choice" required disabled>
-                    <option value="" disabled selected data-type="">Select a type first</option>
+                        <label>Type</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="type" value="income" required>Income</label>
+                            <label><input type="radio" name="type" value="expense" required>Expense</label>
+                        </div>
 
-                    <!-- fixed income categories -->
-                    <option value="salary" data-type="income">Salary</option>
-                    <option value="freelance" data-type="income">Freelance</option>
-                    <option value="gift" data-type="income">Gift</option>
-                    <option value="investment" data-type="income">Investment</option>
+                        <label for="category-choice">Category</label>
+                        <select id="category-choice" required disabled>
+                            <option value="" disabled selected data-type="">Select a type first</option>
 
-                    <!-- fixed expense categories -->
-                    <option value="food" data-type="expense">Food</option>
-                    <option value="groceries" data-type="expense">Groceries</option>
-                    <option value="transport" data-type="expense">Transport</option>
-                    <option value="bills" data-type="expense">Bills</option>
-                    <option value="rent" data-type="expense">Rent</option>
-                    <option value="entertainment" data-type="expense">Entertainment</option>
-                    <option value="shopping" data-type="expense">Shopping</option>
-                    <option value="health" data-type="expense">Health</option>
-                    <option value="education" data-type="expense">Education</option>
-                    <option value="travel" data-type="expense">Travel</option>
-                    <option value="subscriptions" data-type="expense">Subscriptions</option>
+                            <option value="salary" data-type="income">Salary</option>
+                            <option value="freelance" data-type="income">Freelance</option>
+                            <option value="gift" data-type="income">Gift</option>
+                            <option value="investment" data-type="income">Investment</option>
 
-                    <!-- custom categories already saved by this user -->
-                    <% customCategories.forEach(cat=> { %>
-                        <option value="<%= cat.name %>" data-type="<%= cat.type %>" data-custom="true">
-                            <%= cat.name.charAt(0).toUpperCase() + cat.name.slice(1) %>
-                        </option>
-                        <% }) %>
+                            <option value="food" data-type="expense">Food</option>
+                            <option value="groceries" data-type="expense">Groceries</option>
+                            <option value="transport" data-type="expense">Transport</option>
+                            <option value="bills" data-type="expense">Bills</option>
+                            <option value="rent" data-type="expense">Rent</option>
+                            <option value="entertainment" data-type="expense">Entertainment</option>
+                            <option value="shopping" data-type="expense">Shopping</option>
+                            <option value="health" data-type="expense">Health</option>
+                            <option value="education" data-type="expense">Education</option>
+                            <option value="travel" data-type="expense">Travel</option>
+                            <option value="subscriptions" data-type="expense">Subscriptions</option>
 
-                            <!-- generic "other", always available, for adding new one -->
-                            <option value="other" data-type="income">Other</option>
-                            <option value="other" data-type="expense">Other</option>
-                </select>
+                            <% customCategories.forEach(cat=> { %>
+                                <option value="<%= cat.name %>" data-type="<%= cat.type %>" data-custom="true">
+                                    <%= cat.name.charAt(0).toUpperCase() + cat.name.slice(1) %>
+                                </option>
+                                <% }) %>
 
-                <!-- hidden field submitted to the server -->
-                <input type="hidden" id="category" name="category" value="">
+                                    <option value="other" data-type="income">Other (new)</option>
+                                    <option value="other" data-type="expense">Other (new)</option>
+                        </select>
 
-                <div id="new-category-wrapper" style="display: none;">
-                    <label for="newCategory">New Category Name</label>
-                    <input type="text" id="newCategory" name="newCategory" placeholder="Enter new category">
-                </div>
+                        <input type="hidden" id="category" name="category" value="">
 
-                <label for="date">Date</label>
-                <input type="date" id="date" name="date" required>
+                        <div id="new-category-wrapper" style="display: none;">
+                            <label for="newCategory">New Category Name</label>
+                            <input type="text" id="newCategory" name="newCategory" placeholder="Enter new category">
+                        </div>
 
-                <div class="form-actions">
-                    <a href="/transactions" class="btn-cancel">Cancel</a>
-                    <button type="submit" class="btn-save">Save Transaction</button>
-                </div>
-            </form>
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date" required>
+
+                        <div class="form-actions">
+                            <a href="<%= group ? `/groups/${group._id}` : '/transactions' %>"
+                                class="btn-cancel">Cancel</a>
+                            <button type="submit" class="btn-save">Save Transaction</button>
+                        </div>
+                    </form>
         </main>
+
+        <script src="/js/categoryProcessor.js"></script>
 
         <%- include('../partials/_footer.ejs') %>
 </body>

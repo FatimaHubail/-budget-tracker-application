@@ -45,10 +45,12 @@ app.use(addUserToViews);
 // ROUTES
 app.use('', pagesRouter);
 app.use('/auth', authRouter);
-app.use('/transactions', transactionsRouter);
-app.use('/groups', groupsRouter);
+
 // Customer middleware
 app.use(isSignedIn);
+
+app.use('/transactions', transactionsRouter);
+app.use('/groups', groupsRouter);
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);

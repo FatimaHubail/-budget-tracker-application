@@ -3,7 +3,13 @@ const Invitation = require('../models/invitation.js');
 const User = require('../models/user.js');
 const Transaction = require('../models/transaction.js');
 const OtherCategory = require('../models/otherCategory.js');
-const moment = require('moment');;
+const moment = require('moment');
+const {
+    processCustomCategory,
+    getMonthRange,
+    groupTransactionsByCategory,
+    buildBreakdown
+} = require('../utils/transactionHelpers.js');
 
 // index route (groups list)
 const index = async (req, res) => {
@@ -56,18 +62,36 @@ const create = async (req, res) => {
     }
 };
 
+// route to show group details
 const show = async (req, res) => {
     try {
-        const transaction = await Transaction.findById(req.params.id).populate('customCategory');
+        const group = await Group.findById(req.params.id).populate('owner').populate('members.user');
 
-        if (!transaction || transaction.user.toString() !== req.session.user._id) {
-            return res.redirect('/transactions');
-        }
+        if (!group) {
+            return res.redirect('/groups');
+        };
 
-        res.render('transactions/show.ejs', { transaction });
+        // find this user's membership entry to determine their role
+        const membership = group.members.find(
+            member => member.user._id.toString() === req.session.user._id
+        );
+
+        if (!membership) {
+            return res.redirect('/groups');
+        };
+
+        const userRole = membership.role;
+
+        // find all transactions for this group
+        const transactions = await Transaction.find({ group: group._id })
+            .populate('customCategory')
+            .populate('user')
+            .sort({ date: -1 });
+
+        res.render('groups/show.ejs', { group, transactions, userRole });
     } catch (error) {
         console.log(error);
-        res.redirect('/transactions');
+        res.redirect('/groups');
     }
 };
 
@@ -127,6 +151,66 @@ const deleteTransaction = async (req, res) => {
     }
 };
 
+// route to add a new transaction form to the group
+const addTransaction = async (req, res) => {
+    const group = await Group.findById(req.params.id);
+    const customCategories = await OtherCategory.find({ user: req.session.user._id });
+    res.render('transactions/new.ejs', { group, customCategories });
+};
+
+// route to create a new transaction for the group
+const createTransaction = async (req, res) => {
+    try {
+        const group = await Group.findById(req.params.id);
+        const membership = group.members.find(member => member.user.toString() === req.session.user._id);
+
+        if (!membership || membership.role === 'viewer') {
+            return res.redirect(`/groups/${group._id}`);
+        }
+
+        const { title, description, amount, type, category, newCategory, date } = req.body;
+        const customCategoryId = await processCustomCategory(category, newCategory, type, req.session.user._id);
+
+        await Transaction.create({
+            title, description, amount, type, category,
+            customCategory: customCategoryId,
+            date,
+            user: req.session.user._id,
+            group: group._id
+        });
+
+        res.redirect(`/groups/${group._id}`);
+    } catch (error) {
+        console.log(error);
+        res.redirect(`/groups/${req.params.id}/transactions/new`);
+    }
+};
+
+const showTransaction = async (req, res) => {
+    try {
+        const group = await Group.findById(req.params.id);
+
+        const membership = group.members.find(m => m.user.toString() === req.session.user._id);
+        if (!membership) {
+            return res.redirect('/groups');
+        }
+        const userRole = membership.role;
+
+        const transaction = await Transaction.findById(req.params.transactionId)
+            .populate('customCategory')
+            .populate('user');
+
+        if (!transaction || transaction.group.toString() !== group._id.toString()) {
+            return res.redirect(`/groups/${group._id}`);
+        }
+
+        res.render('transactions/show.ejs', { transaction, group, userRole });
+    } catch (error) {
+        console.log(error);
+        res.redirect('/groups');
+    }
+};
+
 const summary = async (req, res) => {
     try {
         // specify summary month
@@ -171,5 +255,8 @@ module.exports = {
     deleteTransaction,
     edit,
     update,
+    addTransaction,
+    createTransaction,
+    showTransaction,
     summary,
 };

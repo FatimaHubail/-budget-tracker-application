@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const User = require('./transaction');
 
 const groupSchema = new mongoose.Schema({
     name: {
@@ -13,10 +12,10 @@ const groupSchema = new mongoose.Schema({
         required: true,
     },
 
-    members: {
+    members: [{
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: User,
+            ref: 'User',
             required: true,
         },
         role: {
@@ -24,7 +23,7 @@ const groupSchema = new mongoose.Schema({
             enum: ['admin', 'editor', 'viewer'],
             required: true,
         }
-    },
+    }],
 
     budgetLimit: {
         type: Number,

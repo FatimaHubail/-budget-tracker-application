@@ -5,8 +5,8 @@ const router = express.Router({ mergeParams: true });
 const groupsCtrl = require('../controllers/groupsCtrl');
 
 router.get('', groupsCtrl.index);
-// router.get('/new', groupsCtrl.newGroup);
-// router.post('', groupsCtrl.create);
+router.get('/new', groupsCtrl.newGroup);
+router.post('', groupsCtrl.create);
 // router.get('/summary', groupsCtrl.summary);
 // router.get('/:id', groupsCtrl.show);
 // router.get('/:id/edit', groupsCtrl.edit);

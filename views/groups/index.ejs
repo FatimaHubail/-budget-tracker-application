@@ -4,81 +4,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>My Groups</title>
 </head>
 
 <body>
     <%- include('../partials/_navbar.ejs') %>
 
-        <main class="dashboard">
-            <!-- ===== Overview Data Cards ===== -->
-            <section class="balance-cards">
-                <div class="card balance">
-                    <h3>Balance</h3>
-                    <p class="amount">
-                        <%= balance.toFixed(3) %>
-                    </p>
-                </div>
+        <main class="groups-page">
 
-                <div class="card income">
-                    <h3>Income</h3>
-                    <p class="amount">
-                        <%= income.toFixed(3) %>
-                    </p>
-                </div>
+            <div class="list-header">
+                <h1>My Groups</h1>
+                <a href="/groups/new" class="btn-add">+ Create New Group</a>
+            </div>
 
-                <div class="card expense">
-                    <h3>Expenses</h3>
-                    <p class="amount">
-                        <%= expense.toFixed(3) %>
-                    </p>
-                </div>
-            </section>
+            <% if (groups.length===0) { %>
+                <p class="empty-state">You're not part of any groups yet. Create one to start sharing a budget.</p>
+                <% } else { %>
+                    <section class="group-cards">
+                        <% groups.forEach(group=> { %>
+                            <a href="/groups/<%= group._id %>" class="card group-card">
+                                <h3 class="group-name">
+                                    <%= group.name %>
+                                </h3>
 
-            <!-- ===== Transaction List ===== -->
-            <section class="transaction-list">
-                <div class="list-header">
-                    <h2>Transactions</h2>
-                    <a href="/transactions/new" class="btn-add">+ Add Transaction</a>
-                </div>
+                                <p class="group-meta">
+                                    <span class="meta-label">Owner:</span>
+                                    <span class="meta-value">
+                                        <%= group.owner.username %>
+                                    </span>
+                                </p>
 
-                <!-- ===== Filters + Search ===== -->
-                <%- include('../partials/_filterBar.ejs', {query}) %>
-
-                    <% if (filteredTransactions.length===0) { %>
-                        <p class="empty-state">
-                            No transactions found. Try adjusting your filters or add a new transaction.
-                        </p>
-                        <% } else { %>
-                            <table class="transaction-table">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Type</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% filteredTransactions.forEach(transaction=> { %>
-                                        <tr class="transaction-row">
-                                            <td>
-                                                <%= transaction.title %>
-                                            </td>
-                                            <td
-                                                class="<%= transaction.type === 'income' ? 'amount-income' : 'amount-expense' %>">
-                                                <%= transaction.type %>
-                                            </td>
-                                            <td>
-                                                <a href="/transactions/<%= transaction._id %>" class="btn-details">
-                                                    View Details
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <% }) %>
-                                </tbody>
-                            </table>
-                            <% } %>
-            </section>
+                                <p class="group-meta">
+                                    <span class="meta-label">Members:</span>
+                                    <span class="meta-value">
+                                        <%= group.members.length %>
+                                    </span>
+                                </p>
+                            </a>
+                            <% }) %>
+                    </section>
+                    <% } %>
 
         </main>
 

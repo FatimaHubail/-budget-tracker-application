@@ -3,59 +3,56 @@ const Invitation = require('../models/invitation.js');
 const User = require('../models/user.js');
 const Transaction = require('../models/transaction.js');
 const OtherCategory = require('../models/otherCategory.js');
-const moment = require('moment');
-const {
-    processCustomCategory,
-    getMonthRange,
-    groupTransactionsByCategory,
-    buildBreakdown
-} = require('../utils/transactionHelpers.js');
+const moment = require('moment');;
 
-// index route (dashboard)
+// index route (groups list)
 const index = async (req, res) => {
     try {
-        const allgroups = await Group.find({ user: req.session.user._id });
+        const groups = await Group.find({
+            'members.user': req.session.user._id
+        }).populate('owner');
 
-        res.render('groups/index.ejs', { groups: allgroups });
+        res.render('groups/index.ejs', { groups });
     } catch (error) {
         console.log(error);
         res.redirect('/');
     }
 };
 
-// route to render the 'add transaction' form 
-const newTransaction = async (req, res) => {
+// route to render the 'add group' form
+const newGroup = async (req, res) => {
     try {
-        const customCategories = await OtherCategory.find({ user: req.session.user._id });
-        res.render('transactions/new.ejs', { customCategories });
+        res.render('groups/new.ejs');
     } catch (error) {
         console.log(error);
         res.redirect('/');
     }
 }
 
-// route to add transaction
+// route to add group
 const create = async (req, res) => {
     try {
-        const { title, description, amount, type, category, newCategory, date } = req.body;
+        const { name, budgetLimit } = req.body;
 
-        const customCategoryId = await processCustomCategory(category, newCategory, type, req.session.user._id);
+        // validate budgetLimit if the user provided one
+        if (budgetLimit && (isNaN(budgetLimit) || Number(budgetLimit) < 0)) {
+            return res.redirect('/groups/new');
+        };
 
-        await Transaction.create({
-            title,
-            description,
-            amount,
-            type,
-            category,
-            customCategory: customCategoryId,
-            date,
-            user: req.session.user._id
+        const group = await Group.create({
+            name,
+            budgetLimit,
+            owner: req.session.user._id,
+            members: [{
+                user: req.session.user._id,
+                role: 'admin'
+            }]
         });
 
-        res.redirect('/transactions');
+        res.redirect(`/groups/${group._id}`);
     } catch (error) {
         console.log(error);
-        res.redirect('/transactions/new');
+        res.redirect('/groups/new');
     }
 };
 
@@ -168,7 +165,7 @@ const summary = async (req, res) => {
 
 module.exports = {
     index,
-    newTransaction,
+    newGroup,
     create,
     show,
     deleteTransaction,

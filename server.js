@@ -46,13 +46,9 @@ app.use(addUserToViews);
 app.use('', pagesRouter);
 app.use('/auth', authRouter);
 app.use('/transactions', transactionsRouter);
-// app.use('/groups', groupsRouter);
+app.use('/groups', groupsRouter);
 // Customer middleware
 app.use(isSignedIn);
-
-app.get('/protected', async (req, res) => {
-  res.send(`You are logged in as ${req.session.user.username}`);
-});
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);

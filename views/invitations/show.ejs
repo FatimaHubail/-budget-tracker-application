@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Invitation</title>
+</head>
+
+<body>
+    <%- include('../partials/_navbar.ejs') %>
+
+        <main class="invitation-page">
+            <div class="invitation-card">
+                <h1>You've been invited!</h1>
+
+                <p class="invitation-message">
+                    <strong>
+                        <%= invitation.invitedBy.username %>
+                    </strong> invited you to join
+                    <strong>
+                        <%= invitation.group.name %>
+                    </strong> as a
+                    <strong>
+                        <%= invitation.role %>
+                    </strong>.
+                </p>
+
+                <div class="invitation-actions">
+                    <form action="/invitations/<%= invitation._id %>/accept" method="POST">
+                        <button type="submit" class="btn-save">Accept</button>
+                    </form>
+
+                    <form action="/invitations/<%= invitation._id %>/decline" method="POST">
+                        <button type="submit" class="btn-cancel">Decline</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../partials/_footer.ejs') %>
+</body>
+
+</html>

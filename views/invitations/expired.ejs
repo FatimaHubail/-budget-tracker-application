@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation Not Available</title>
+</head>
+
+<body>
+    <%- include('../partials/_navbar.ejs') %>
+
+        <main class="invitation-page">
+            <div class="invitation-card expired-card">
+                <h1>This invitation isn't available</h1>
+                <p class="invitation-message">
+                    This invite link may have already been used, declined, or doesn't exist.
+                    If you were expecting an invitation, ask the group admin to send a new one.
+                </p>
+
+                <a href="/groups" class="btn-save">Go to My Groups</a>
+            </div>
+        </main>
+
+        <%- include('../partials/_footer.ejs') %>
+</body>
+
+</html>

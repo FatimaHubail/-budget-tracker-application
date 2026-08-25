@@ -4,6 +4,7 @@ const User = require('../models/user.js');
 const Transaction = require('../models/transaction.js');
 const OtherCategory = require('../models/otherCategory.js');
 const moment = require('moment');
+const {sendInviteEmail} = require('../utils/mailer.js');
 const {
     processCustomCategory,
     getMonthRange,
@@ -15,6 +16,8 @@ const {
     getGroupTransaction,
     canModifyTransaction
 } = require('../utils/groupHelpers.js');
+
+// -------------------------- Groups Controller --------------------------
 
 // index route (groups list)
 const index = async (req, res) => {
@@ -138,6 +141,8 @@ const update = async (req, res) => {
         res.redirect(`/transactions/${req.params.id}/edit`);
     }
 };
+
+// ---------------------------------- Group Transactions Controller --------------------------
 
 // route to add a new transaction form to the group
 const addTransaction = async (req, res) => {
@@ -285,6 +290,64 @@ const deleteTransaction = async (req, res) => {
 
 };
 
+// ---------------------------------- Membership and Invitation Controller --------------------------
+// route to show the 'add member' form
+const newInvite = async (req, res) => {
+    try {
+        const group = await Group.findById(req.params.id);
+        const membership = group.members.find(m => m.user.toString() === req.session.user._id);
+
+        // only admins can access the invite form
+        if (!membership || membership.role !== 'admin') {
+            return res.redirect(`/groups/${group._id}`);
+        }
+
+        res.render('groups/members/new.ejs', { group });
+    } catch (error) {
+        console.log(error);
+        res.redirect('/groups');
+    }
+}
+const invite = async (req, res) => { 
+    try {
+        const group = await Group.findById(req.params.id);
+        const membership = await Group.members.find(member => member.toString() === req.session.user._id);
+        
+        // only admins can invite
+        if (!membership || membership.role !== 'admin') {
+            return res.redirect(`/groups/${group._id}`);
+        }
+
+        const { email, role } = req.body;
+
+        // avoid duplicate invites
+        const existingInvite = await Invitation.findOne({
+            group: group._id,
+            email: email.toLowerCase(),
+            status: 'pending',
+        });
+
+        if (existingInvite) {
+            return res.redirect(`/groups/${group._id}`);
+        }
+
+        const invitation = await invite.create({
+            group: group._id,
+            email: email.toLowerCase(),
+            invitedBy: req.session.user._id,
+            role
+        });
+
+        // invitation link, invitation id as token 
+        const inviteLink = `${process.env.BASE_URL}/invitations/${invitation._id}`;
+        await sendInviteEmail(email, inviteLink, group.name);
+        res.redirect(`/groups/${group._id}`);
+    } catch (error) {
+        console.log(error);
+        res.redirect(`/groups/${req.params.id}/members/new`);
+    }
+};
+
 const summary = async (req, res) => {
     try {
         // specify summary month
@@ -334,5 +397,7 @@ module.exports = {
     editTransaction,
     updateTransaction,
     deleteTransaction,
+    newInvite,
+    invite,
     summary,
 };

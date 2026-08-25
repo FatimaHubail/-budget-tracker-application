@@ -20,6 +20,7 @@ const authRouter = require('./routes/authRouter');
 const pagesRouter = require('./routes/pagesRouter');
 const transactionsRouter = require('./routes/transactionsRouter');
 const groupsRouter = require('./routes/groupsRouter');
+const invitationsRouter = require('./routes/invitationsRouter');
 
 // Set the port from environment variable or default to 3000
 const port = process.env.PORT ? process.env.PORT : '3000';
@@ -44,7 +45,8 @@ app.use(addUserToViews);
 
 // ROUTES
 app.use('', pagesRouter);
-app.use('/auth', authRouter);
+app.use('/auth', authRouter); 
+app.use('/invitations', invitationsRouter);
 
 // Customer middleware
 app.use(isSignedIn);

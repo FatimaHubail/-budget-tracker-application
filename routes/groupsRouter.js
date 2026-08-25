@@ -21,4 +21,8 @@ router.get('/:id/transactions/:transactionId/edit', groupsCtrl.editTransaction);
 router.put('/:id/transactions/:transactionId', groupsCtrl.updateTransaction);
 router.delete('/:id/transactions/:transactionId', groupsCtrl.deleteTransaction);
 
+// invite routes for groups
+router.get('/:id/members/new', groupsCtrl.newInvite);
+router.post('/:id/invite', groupsCtrl.invite);
+
 module.exports = router;

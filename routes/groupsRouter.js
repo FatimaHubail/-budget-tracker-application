@@ -9,9 +9,10 @@ router.get('', groupsCtrl.index);
 router.get('/new', groupsCtrl.newGroup);
 router.post('', groupsCtrl.create);
 router.get('/:id', groupsCtrl.show);
-// router.get('/:id/edit', groupsCtrl.edit);
-// router.put('/:id', groupsCtrl.update);
-// router.delete('/:id', groupsCtrl.deleteGroup);
+router.get('/:id/edit', groupsCtrl.edit);
+router.put('/:id', groupsCtrl.update);
+router.delete('/:id', groupsCtrl.deleteGroup);
+router.delete('/:id/leave', groupsCtrl.leave);
 
 // Transaction routes for groups
 router.get('/:id/transactions/new', groupsCtrl.addTransaction);

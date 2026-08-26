@@ -106,39 +106,121 @@ const show = async (req, res) => {
 // route to show the edit page
 const edit = async (req, res) => {
     try {
-        const transaction = await Transaction.findById(req.params.id);
-        const customCategories = await OtherCategory.find({ user: req.session.user._id });
-
-        if (!transaction || transaction.user.toString() !== req.session.user._id) {
-            return res.redirect('/transactions');
+        const result = await getGroupAndMembership(req.params.id, req.session.user._id);
+        if (!result) {
+            return res.redirect('/groups');
         }
+        const { group, membership } = result;
 
-        res.render('transactions/edit.ejs', { transaction, customCategories });
+        // every member can open the form, but the view hides the budget field from non-admins
+        res.render('groups/edit.ejs', { group, userRole: membership.role });
     } catch (error) {
         console.log(error);
-        res.redirect('/');
+        res.redirect('/groups');
     }
 };
 
 // update route
 const update = async (req, res) => {
     try {
-        const transaction = await Transaction.findById(req.params.id);
-        if (!transaction || transaction.user.toString() !== req.session.user._id) {
-            return res.redirect('/transactions');
+        const result = await getGroupAndMembership(req.params.id, req.session.user._id);
+        if (!result) {
+            return res.redirect('/groups');
+        }
+        const { group, membership } = result;
+
+        const { name, budgetLimit } = req.body;
+
+        // any member can rename the group
+        if (!name || !name.trim()) {
+            return res.redirect(`/groups/${group._id}/edit`);
         }
 
-        const { title, description, amount, type, category, newCategory, date } = req.body;
-        const customCategoryId = await processCustomCategory(category, newCategory, type, req.session.user._id);
+        const payload = { name: name.trim() };
 
-        const payload = { title, description, amount, type, category, customCategory: customCategoryId, date }
-        await Transaction.findByIdAndUpdate(req.params.id, payload, { runValidators: true });
+        // only admins can change the budget limit, everyone else keeps the current value
+        if (membership.role === 'admin') {
+            if (budgetLimit === undefined || budgetLimit === '') {
+                // admin cleared the field, so remove the limit
+                payload.budgetLimit = null;
+            } else if (isNaN(budgetLimit) || Number(budgetLimit) < 0) {
+                return res.redirect(`/groups/${group._id}/edit`);
+            } else {
+                payload.budgetLimit = Number(budgetLimit);
+            }
+        }
 
-        res.redirect(`/transactions/${req.params.id}`);
+        await Group.findByIdAndUpdate(group._id, payload, { runValidators: true });
+
+        res.redirect(`/groups/${group._id}`);
 
     } catch (error) {
         console.log(error);
-        res.redirect(`/transactions/${req.params.id}/edit`);
+        res.redirect(`/groups/${req.params.id}/edit`);
+    }
+};
+
+const deleteGroup = async (req, res) => {
+    try {
+        const result = await getGroupAndMembership(req.params.id, req.session.user._id);
+        if (!result) {
+            return res.redirect('/groups');
+        }
+        const { group, membership } = result;
+
+        // only admins can delete the group
+        if (membership.role !== 'admin') {
+            return res.redirect(`/groups/${group._id}`);
+        }
+
+        // clean up everything that belongs to the group
+        await Transaction.deleteMany({ group: group._id });
+        await Invitation.deleteMany({ group: group._id });
+        await Group.findByIdAndDelete(group._id);
+
+        res.redirect('/groups');
+    } catch (error) {
+        console.log(error);
+        res.redirect(`/groups/${req.params.id}`);
+    }
+};
+
+// route for a member to leave the group
+const leave = async (req, res) => {
+    try {
+        const result = await getGroupAndMembership(req.params.id, req.session.user._id);
+        if (!result) {
+            return res.redirect('/groups');
+        }
+        const { group } = result;
+
+        const isOwner = group.owner.toString() === req.session.user._id;
+        const remainingMembers = group.members.filter(
+            member => member.user.toString() !== req.session.user._id
+        );
+
+        if (isOwner) {
+            if (remainingMembers.length === 0) {
+                // no one left to hand the group to, so it goes away with its owner
+                await Transaction.deleteMany({ group: group._id });
+                await Invitation.deleteMany({ group: group._id });
+                await Group.findByIdAndDelete(group._id);
+                return res.redirect('/groups');
+            }
+
+            // hand ownership to the next member in line and make sure they're admin
+            const newOwner = remainingMembers[0];
+            newOwner.role = 'admin';
+            group.owner = newOwner.user;
+        }
+
+        group.members = remainingMembers;
+        await group.save();
+
+        res.redirect('/groups');
+    } catch (error) {
+        console.log(error);
+        res.redirect(`/groups/${req.params.id}`);
     }
 };
 
@@ -391,12 +473,18 @@ module.exports = {
     show,
     edit,
     update,
+    deleteGroup,
+    leave,
+
+    // transactions
     addTransaction,
     createTransaction,
     showTransaction,
     editTransaction,
     updateTransaction,
     deleteTransaction,
+
+    //invites
     newInvite,
     invite,
     summary,

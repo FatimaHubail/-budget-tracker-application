@@ -11,40 +11,56 @@
     <%- include('../partials/_navbar.ejs') %>
     
         <main class="dashboard">
-            <div class="list-header">
-                <h1>Dashboard</h1>
-                <a href="/transactions/summary" class="btn-add">View Summary</a>
-            </div>
-
-            <!-- ===== Overview Data Cards ===== -->
-             <section class="balance-cards">
+    
+            <!-- ===== Currency Toggle ===== -->
+            <form method="GET" action="/transactions" class="currency-toggle">
+                <input type="hidden" name="category" value="<%= query.category || '' %>">
+                <input type="hidden" name="type" value="<%= query.type || '' %>">
+                <input type="hidden" name="month" value="<%= query.month || '' %>">
+                <input type="hidden" name="search" value="<%= query.search || '' %>">
+                <label for="displayCurrency">Show amounts in:</label>
+                <select id="displayCurrency" name="displayCurrency" onchange="this.form.submit()">
+                    <option value="BHD" <%=displayCurrency==='BHD' ? 'selected' : '' %>>BHD</option>
+                    <option value="USD" <%=displayCurrency==='USD' ? 'selected' : '' %>>USD</option>
+                    <option value="EUR" <%=displayCurrency==='EUR' ? 'selected' : '' %>>EUR</option>
+                    <option value="GBP" <%=displayCurrency==='GBP' ? 'selected' : '' %>>GBP</option>
+                    <option value="SAR" <%=displayCurrency==='SAR' ? 'selected' : '' %>>SAR</option>
+                    <option value="AED" <%=displayCurrency==='AED' ? 'selected' : '' %>>AED</option>
+                </select>
+            </form>
+    
+            <!-- ===== Balance Overview Cards ===== -->
+            <section class="balance-cards">
                 <div class="card balance">
                     <h3>Balance</h3>
-                    <p class="amount"><%= balance.toFixed(3) %></p>
+                    <p class="amount">
+                        <%= balance.toFixed(decimals) %>
+                            <%= displayCurrency %>
+                    </p>
                 </div>
-
                 <div class="card income">
                     <h3>Income</h3>
                     <p class="amount">
-                        <%= income.toFixed(3) %>
+                        <%= income.toFixed(decimals) %>
+                            <%= displayCurrency %>
                     </p>
                 </div>
-
                 <div class="card expense">
                     <h3>Expenses</h3>
                     <p class="amount">
-                        <%= expense.toFixed(3) %>
+                        <%= expense.toFixed(decimals) %>
+                            <%= displayCurrency %>
                     </p>
                 </div>
-             </section>
-
+            </section>
+    
             <!-- ===== Budget Status ===== -->
             <section class="budget-section">
                 <div class="list-header">
                     <h2>Budget</h2>
                     <a href="/budgets/new" class="btn-add">+ Set Budget</a>
                 </div>
-            
+    
                 <% if (budgets.length===0) { %>
                     <p class="empty-state">No budget limits set yet.</p>
                     <% } else { %>
@@ -53,17 +69,22 @@
                                 <li class="budget-item <%= budget.exceeded ? 'budget-exceeded' : '' %>">
                                     <div class="budget-label">
                                         <span>
-                                            <%= budget.category ? budget.category.charAt(0).toUpperCase() + budget.category.slice(1)
-                                                : 'Overall' %>
+                                            <%= budget.category ? budget.category.charAt(0).toUpperCase() +
+                                                budget.category.slice(1) : 'Overall' %>
                                         </span>
-                                        <span>$<%= budget.spent.toFixed(2) %> / $<%= budget.limit.toFixed(2) %></span>
+                                        <span>
+                                            <%= budget.spent.toFixed(decimals) %> / <%= budget.limit.toFixed(decimals) %>
+                                                    <%= displayCurrency %>
+                                        </span>
                                     </div>
                                     <div class="bar-track">
                                         <div class="bar-fill <%= budget.exceeded ? 'expense-fill' : 'income-fill' %>"
                                             style="width: <%= Math.min(budget.percentage, 100).toFixed(1) %>%;"></div>
                                     </div>
                                     <% if (budget.exceeded) { %>
-                                        <p class="budget-warning">Exceeded by $<%= (budget.spent - budget.limit).toFixed(2) %>
+                                        <p class="budget-warning">⚠️ Exceeded by <%= (budget.spent -
+                                                budget.limit).toFixed(decimals) %>
+                                                <%= displayCurrency %>
                                         </p>
                                         <% } %>
                                 </li>
@@ -71,51 +92,48 @@
                         </ul>
                         <% } %>
             </section>
-
-            <!-- ===== Transaction List ===== -->
-            <section class="transaction-list">
-                <div class="list-header">
-                    <h2>Transactions</h2>
-                    <a href="/transactions/new" class="btn-add">+ Add Transaction</a>
-                </div>
-
-                <!-- ===== Filters + Search ===== -->
-                <%- include('../partials/_filterBar.ejs', {query, action: '/transactions'}) %>
     
-                <% if (filteredTransactions.length === 0) { %>
-                    <p class="empty-state">
-                        No transactions found. Try adjusting your filters or add a new transaction.
-                    </p>
-                    <% } else { %>
-                        <table class="transaction-table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Type</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% filteredTransactions.forEach(transaction=> { %>
-                                    <tr class="transaction-row">
-                                        <td>
-                                            <%= transaction.title %>
-                                        </td>
-                                        <td
-                                            class="<%= transaction.type === 'income' ? 'amount-income' : 'amount-expense' %>">
-                                            <%= transaction.type %>
-                                        </td>
-                                        <td>
-                                            <a href="/transactions/<%= transaction._id %>" class="btn-details">
-                                                View Details
-                                            </a>
-                                        </td>
+            <%- include('../partials/_filterBar.ejs', { query, action: '/transactions' }) %>
+    
+                <!-- ===== Transaction List ===== -->
+                <section class="transaction-list">
+                    <div class="list-header">
+                        <h2>Transactions</h2>
+                        <a href="/transactions/new" class="btn-add">+ Add Transaction</a>
+                    </div>
+    
+                    <% if (transactions.length===0) { %>
+                        <p class="empty-state">No transactions found. Try adjusting your filters or add a new transaction.
+                        </p>
+                        <% } else { %>
+                            <table class="transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th></th>
                                     </tr>
-                                    <% }) %>
-                            </tbody>
-                        </table>
-                        <% } %>
-            </section>
+                                </thead>
+                                <tbody>
+                                    <% transactions.forEach(transaction=> { %>
+                                        <tr class="transaction-row">
+                                            <td>
+                                                <%= transaction.title %>
+                                            </td>
+                                            <td
+                                                class="<%= transaction.type === 'income' ? 'amount-income' : 'amount-expense' %>">
+                                                <%= transaction.type %>
+                                            </td>
+                                            <td>
+                                                <a href="/transactions/<%= transaction._id %>" class="btn-details">View
+                                                    Details</a>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                            <% } %>
+                </section>
     
         </main>
     

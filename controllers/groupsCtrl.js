@@ -4,7 +4,8 @@ const User = require('../models/user.js');
 const Transaction = require('../models/transaction.js');
 const OtherCategory = require('../models/otherCategory.js');
 const moment = require('moment');
-const {sendInviteEmail} = require('../utils/mailer.js');
+const { sendInviteEmail } = require('../utils/mailer.js');
+const { getExchangeRate, decimalsFor } = require('../utils/currencyHelper.js');
 const {
     processCustomCategory,
     isFutureDate,
@@ -97,9 +98,30 @@ const show = async (req, res) => {
             .populate('customCategory')
             .populate('user')
             .sort({ date: -1 });
+
         const budgets = await calculateBudgetStatus({ group: group._id }, moment().format('YYYY-MM'));
 
-        res.render('groups/show.ejs', { group, transactions, userRole, query: req.query, budgets });
+        // ===== display currency conversion =====
+        const displayCurrency = req.query.displayCurrency || 'BHD';
+
+        if (displayCurrency !== 'BHD') {
+            const rate = await getExchangeRate('BHD', displayCurrency);
+            budgets.forEach(budget => {
+                budget.spent *= rate;
+                budget.limit *= rate;
+            });
+        }
+
+        res.render('groups/show.ejs', {
+            group,
+            transactions,
+            userRole,
+            query: req.query,
+            budgets,
+            user: req.session.user,
+            displayCurrency,
+            decimals: decimalsFor(displayCurrency)
+        });
     } catch (error) {
         console.log(error);
         res.redirect('/groups');
@@ -405,11 +427,12 @@ const newInvite = async (req, res) => {
         res.redirect('/groups');
     }
 }
-const invite = async (req, res) => { 
+
+const invite = async (req, res) => {
     try {
         const group = await Group.findById(req.params.id);
-        const membership = await Group.members.find(member => member.toString() === req.session.user._id);
-        
+        const membership = group.members.find(m => m.user.toString() === req.session.user._id);
+
         // only admins can invite
         if (!membership || membership.role !== 'admin') {
             return res.redirect(`/groups/${group._id}`);
@@ -428,14 +451,14 @@ const invite = async (req, res) => {
             return res.redirect(`/groups/${group._id}`);
         }
 
-        const invitation = await invite.create({
+        const invitation = await Invitation.create({
             group: group._id,
             email: email.toLowerCase(),
             invitedBy: req.session.user._id,
             role
         });
 
-        // invitation link, invitation id as token 
+        // invitation link, invitation id as token
         const inviteLink = `${process.env.BASE_URL}/invitations/${invitation._id}`;
         await sendInviteEmail(email, inviteLink, group.name);
         res.redirect(`/groups/${group._id}`);

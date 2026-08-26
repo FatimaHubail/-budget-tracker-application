@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/stylesheets/style.css">
     <link rel="stylesheet" href="/stylesheets/partials.css">
     <title>
-        <%= transaction.title %>Transaction Details
+        <%= transaction.title %> - Transaction Details
     </title>
 </head>
 
@@ -27,8 +27,15 @@
                         <%= transaction.title %>
                     </h1>
                     <p class="detail-amount <%= transaction.type === 'income' ? 'amount-income' : 'amount-expense' %>">
-                        <%= transaction.type==='income' ? '+' : '-' %>$<%= transaction.amount.toFixed(2) %>
+                        <%= transaction.type==='income' ? '+' : '-' %>
+                            <%= transaction.amount.toFixed(3) %> BD
                     </p>
+                    <% if (transaction.originalCurrency) { %>
+                        <p class="original-amount-note">
+                            (<%= transaction.originalAmount.toFixed(2) %>
+                                <%= transaction.originalCurrency %>)
+                        </p>
+                        <% } %>
                 </div>
 
                 <dl class="detail-list">
@@ -77,14 +84,19 @@
                     </div>
                     <% } %>
 
-                        <% if (group && (userRole==='admin' || transaction.user.toString()===userId)) { %>
+                        <% if (group && (userRole==='admin' || userRole==='editor' )) { %>
                             <div class="detail-actions">
-                                <a href="/groups/<%= group._id %>/transactions/<%= transaction._id %>/edit" class="btn-edit">Edit</a>
-                                <form action="/groups/<%= group._id %>/transactions/<%= transaction._id %>?_method=DELETE" method="POST"
-                                    class="delete-form">
-                                    <button type="submit" class="btn-delete"
-                                        onclick="return confirm('Are you sure you want to delete this transaction?');">Delete</button>
-                                </form>
+                                <a href="/groups/<%= group._id %>/transactions/<%= transaction._id %>/edit"
+                                    class="btn-edit">Edit</a>
+
+                                <% if (userRole==='admin' ) { %>
+                                    <form
+                                        action="/groups/<%= group._id %>/transactions/<%= transaction._id %>?_method=DELETE"
+                                        method="POST" class="delete-form">
+                                        <button type="submit" class="btn-delete"
+                                            onclick="return confirm('Are you sure you want to delete this transaction?');">Delete</button>
+                                    </form>
+                                    <% } %>
                             </div>
                             <% } %>
 

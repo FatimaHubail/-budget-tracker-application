@@ -642,6 +642,14 @@ select:focus {
   font-weight: 700;
 }
 
+.original-amount-note {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  width: 100%;
+  text-align: right;
+  margin-top: -12px;
+}
+
 .detail-list {
   display: grid;
   grid-template-columns: 140px 1fr;

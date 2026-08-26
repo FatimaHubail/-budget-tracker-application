@@ -26,10 +26,6 @@
                     </h1>
                     <p class="group-meta">Owner: <%= group.owner.username %>
                     </p>
-                    <% if (group.budgetLimit) { %>
-                        <p class="group-meta">Monthly Budget Limit: $<%= group.budgetLimit.toFixed(2) %>
-                        </p>
-                        <% } %>
                 </div>
 
                 <div class="group-actions">
@@ -56,13 +52,30 @@
                 </div>
             </div>
 
+            <!-- ===== Currency Toggle ===== -->
+            <form method="GET" action="/groups/<%= group._id %>" class="currency-toggle">
+                <input type="hidden" name="category" value="<%= query.category || '' %>">
+                <input type="hidden" name="type" value="<%= query.type || '' %>">
+                <input type="hidden" name="month" value="<%= query.month || '' %>">
+                <input type="hidden" name="search" value="<%= query.search || '' %>">
+                <label for="displayCurrency">Show amounts in:</label>
+                <select id="displayCurrency" name="displayCurrency" onchange="this.form.submit()">
+                    <option value="BHD" <%=displayCurrency==='BHD' ? 'selected' : '' %>>BHD</option>
+                    <option value="USD" <%=displayCurrency==='USD' ? 'selected' : '' %>>USD</option>
+                    <option value="EUR" <%=displayCurrency==='EUR' ? 'selected' : '' %>>EUR</option>
+                    <option value="GBP" <%=displayCurrency==='GBP' ? 'selected' : '' %>>GBP</option>
+                    <option value="SAR" <%=displayCurrency==='SAR' ? 'selected' : '' %>>SAR</option>
+                    <option value="AED" <%=displayCurrency==='AED' ? 'selected' : '' %>>AED</option>
+                </select>
+            </form>
+
             <!-- ===== Budget Status ===== -->
             <section class="budget-section">
                 <div class="list-header">
                     <h2>Budget</h2>
                     <a href="/groups/<%= group._id %>/budgets/new" class="btn-add">+ Set Budget</a>
                 </div>
-            
+
                 <% if (budgets.length===0) { %>
                     <p class="empty-state">No budget limits set yet.</p>
                     <% } else { %>
@@ -71,17 +84,23 @@
                                 <li class="budget-item <%= budget.exceeded ? 'budget-exceeded' : '' %>">
                                     <div class="budget-label">
                                         <span>
-                                            <%= budget.category ? budget.category.charAt(0).toUpperCase() + budget.category.slice(1)
-                                                : 'Overall' %>
+                                            <%= budget.category ? budget.category.charAt(0).toUpperCase() +
+                                                budget.category.slice(1) : 'Overall' %>
                                         </span>
-                                        <span>$<%= budget.spent.toFixed(2) %> / $<%= budget.limit.toFixed(2) %></span>
+                                        <span>
+                                            <%= budget.spent.toFixed(decimals) %> / <%= budget.limit.toFixed(decimals)
+                                                    %>
+                                                    <%= displayCurrency %>
+                                        </span>
                                     </div>
                                     <div class="bar-track">
                                         <div class="bar-fill <%= budget.exceeded ? 'expense-fill' : 'income-fill' %>"
                                             style="width: <%= Math.min(budget.percentage, 100).toFixed(1) %>%;"></div>
                                     </div>
                                     <% if (budget.exceeded) { %>
-                                        <p class="budget-warning">Exceeded by $<%= (budget.spent - budget.limit).toFixed(2) %>
+                                        <p class="budget-warning">Exceeded by <%= (budget.spent -
+                                                budget.limit).toFixed(decimals) %>
+                                                <%= displayCurrency %>
                                         </p>
                                         <% } %>
                                 </li>
@@ -119,48 +138,48 @@
                 <!-- ===== Filters + Search ===== -->
                 <%- include('../partials/_filterBar.ejs', {query, action: `/groups/${group._id}`}) %>
 
-                <% if (transactions.length===0) { %>
-                    <p class="empty-state">
-                        <% if (query.category || query.type || query.month) { %>
-                            No transactions found. Try adjusting your filters.
-                            <% } else { %>
-                                No transactions in this group yet.
-                                <% } %>
-                    </p>
-                    <% } else { %>
-                        <table class="transaction-table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Type</th>
-                                    <th>Added By</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% transactions.forEach(transaction=> { %>
-                                    <tr class="transaction-row">
-                                        <td>
-                                            <%= transaction.title %>
-                                        </td>
-                                        <td
-                                            class="<%= transaction.type === 'income' ? 'amount-income' : 'amount-expense' %>">
-                                            <%= transaction.type %>
-                                        </td>
-                                        <td>
-                                            <%= transaction.user ? transaction.user.username : '—' %>
-                                        </td>
-                                        <td>
-                                            <a href="/groups/<%= group._id %>/transactions/<%= transaction._id %>"
-                                                class="btn-details">
-                                                View Details
-                                            </a>
-                                        </td>
+                    <% if (transactions.length===0) { %>
+                        <p class="empty-state">
+                            <% if (query.category || query.type || query.month) { %>
+                                No transactions found. Try adjusting your filters.
+                                <% } else { %>
+                                    No transactions in this group yet.
+                                    <% } %>
+                        </p>
+                        <% } else { %>
+                            <table class="transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Added By</th>
+                                        <th></th>
                                     </tr>
-                                    <% }) %>
-                            </tbody>
-                        </table>
-                        <% } %>
+                                </thead>
+                                <tbody>
+                                    <% transactions.forEach(transaction=> { %>
+                                        <tr class="transaction-row">
+                                            <td>
+                                                <%= transaction.title %>
+                                            </td>
+                                            <td
+                                                class="<%= transaction.type === 'income' ? 'amount-income' : 'amount-expense' %>">
+                                                <%= transaction.type %>
+                                            </td>
+                                            <td>
+                                                <%= transaction.user ? transaction.user.username : '—' %>
+                                            </td>
+                                            <td>
+                                                <a href="/groups/<%= group._id %>/transactions/<%= transaction._id %>"
+                                                    class="btn-details">
+                                                    View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                            <% } %>
             </section>
 
         </main>

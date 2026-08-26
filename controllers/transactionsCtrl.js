@@ -3,6 +3,7 @@ const Transaction = require('../models/transaction.js');
 const OtherCategory = require('../models/otherCategory.js');
 const moment = require('moment');
 const { calculateBudgetStatus } = require('../utils/budgetHelpers.js');
+const { convertToBHD, convertFromBHD, decimalsFor, getExchangeRate } = require('../utils/currencyHelper.js');
 const {
     processCustomCategory,
     isFutureDate,
@@ -13,12 +14,26 @@ const {
 // index route (dashboard)
 const index = async (req, res) => {
     try {
-        const allTransactions = await Transaction.find({ user: req.session.user._id }).sort({date: -1}); 
+        const { category, type, month, search } = req.query;
 
-        // Calculating balance, expenses, and income
+        // build the filter object for the displayed list
+        const filter = { user: req.session.user._id };
+        if (category) filter.category = category;
+        if (type) filter.type = type;
+        if (search) filter.title = { $regex: search, $options: 'i' };
+
+        if (month) {
+            const { start, end } = getMonthRange(month);
+            filter.date = { $gte: start, $lte: end };
+        }
+
+        const transactions = await Transaction.find(filter).sort({ date: -1 });
+
+        // unfiltered, all user's transactions, used for totals
+        const allTransactions = await Transaction.find({ user: req.session.user._id });
+
         let income = 0;
         let expense = 0;
-        let balance = 0;
 
         allTransactions.forEach(transaction => {
             if (transaction.type === 'income') {
@@ -28,15 +43,40 @@ const index = async (req, res) => {
             }
         });
 
-        balance = income - expense;
+        let balance = income - expense;
 
-        // filtering transactions
-        const filter = buildTransactionFilter({ user: req.session.user._id }, req.query);
-        const filteredTransactions = await Transaction.find(filter).sort({date: -1});
+        // budget status for the current month, always calculated in BHD
+        const budgets = await calculateBudgetStatus(
+            { user: req.session.user._id },
+            moment().format('YYYY-MM')
+        );
 
-        const budgets = await calculateBudgetStatus({ user: req.session.user._id }, moment().format('YYYY-MM'));
+        // display currency conversion 
+        const displayCurrency = req.query.displayCurrency || 'BHD';
 
-        res.render('transactions/index.ejs', {filteredTransactions, income, expense, balance, query:req.query, budgets});
+        if (displayCurrency !== 'BHD') {
+            const rate = await getExchangeRate('BHD', displayCurrency);
+
+            income *= rate;
+            expense *= rate;
+            balance *= rate;
+
+            budgets.forEach(budget => {
+                budget.spent *= rate;
+                budget.limit *= rate;
+            });
+        }
+
+        res.render('transactions/index.ejs', {
+            transactions,
+            income,
+            expense,
+            balance,
+            query: req.query,
+            budgets,
+            displayCurrency,
+            decimals: decimalsFor(displayCurrency)
+        });
     } catch (error) {
         console.log(error);
         res.redirect('/');
@@ -57,7 +97,7 @@ const newTransaction = async (req, res) => {
 // route to add transaction
 const create = async (req, res) => {
     try {
-        const { title, description, amount, type, category, newCategory, date } = req.body;
+        const { title, description, amount, currency, type, category, newCategory, date } = req.body;
 
         // transactions can't be dated in the future
         if (isFutureDate(date)) {
@@ -66,10 +106,23 @@ const create = async (req, res) => {
 
         const customCategoryId = await processCustomCategory(category, newCategory, type, req.session.user._id);
 
+        let bhdAmount = Number(amount);
+        let originalAmount, originalCurrency;
+
+        // exchange currency if user picked something other than BHD
+        if (currency && currency !== 'BHD') {
+            bhdAmount = await convertToBHD(Number(amount), currency);
+
+            originalAmount = Number(amount);
+            originalCurrency = currency;
+        }
+
         await Transaction.create({
             title,
             description,
-            amount,
+            amount: bhdAmount,
+            originalAmount,
+            originalCurrency,
             type,
             category,
             customCategory: customCategoryId,

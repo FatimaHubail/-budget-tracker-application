@@ -20,6 +20,7 @@ const methodOverride = require('method-override');
 const morgan = require('morgan');
 const isSignedIn = require('./middleware/isSignedIn');
 const addUserToViews = require('./middleware/addUserToViews');
+const { SUPPORTED_CURRENCIES } = require('./utils/currencyHelper');
 
 // Routers
 const authRouter = require('./routes/authRouter');
@@ -28,6 +29,9 @@ const transactionsRouter = require('./routes/transactionsRouter');
 const groupsRouter = require('./routes/groupsRouter');
 const invitationsRouter = require('./routes/invitationsRouter');
 const budgetsRouter = require('./routes/budgetsRouter');
+
+// make the currency list available to every view
+app.locals.currencies = SUPPORTED_CURRENCIES;
 
 // Set the port from environment variable or default to 3000
 const port = process.env.PORT ? process.env.PORT : '3000';

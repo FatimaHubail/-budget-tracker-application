@@ -36,14 +36,9 @@
 
                         <label for="currency">Currency</label>
                         <select id="currency" name="currency">
-                            <option value="BHD" selected>BHD</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                            <option value="GBP">GBP</option>
-                            <option value="SAR">SAR</option>
-                            <option value="AED">AED</option>
-                            <option value="KWD">KWD</option>
-                            <option value="EGP">EGP</option>
+                            <% currencies.forEach(code => { %>
+                                <option value="<%= code %>" <%= code === 'BHD' ? 'selected' : '' %>><%= code %></option>
+                            <% }) %>
                         </select>
 
                         <label>Type</label>

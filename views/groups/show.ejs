@@ -60,12 +60,9 @@
                 <input type="hidden" name="search" value="<%= query.search || '' %>">
                 <label for="displayCurrency">Show amounts in:</label>
                 <select id="displayCurrency" name="displayCurrency" onchange="this.form.submit()">
-                    <option value="BHD" <%=displayCurrency==='BHD' ? 'selected' : '' %>>BHD</option>
-                    <option value="USD" <%=displayCurrency==='USD' ? 'selected' : '' %>>USD</option>
-                    <option value="EUR" <%=displayCurrency==='EUR' ? 'selected' : '' %>>EUR</option>
-                    <option value="GBP" <%=displayCurrency==='GBP' ? 'selected' : '' %>>GBP</option>
-                    <option value="SAR" <%=displayCurrency==='SAR' ? 'selected' : '' %>>SAR</option>
-                    <option value="AED" <%=displayCurrency==='AED' ? 'selected' : '' %>>AED</option>
+                    <% currencies.forEach(code => { %>
+                        <option value="<%= code %>" <%=displayCurrency===code ? 'selected' : '' %>><%= code %></option>
+                    <% }) %>
                 </select>
             </form>
 

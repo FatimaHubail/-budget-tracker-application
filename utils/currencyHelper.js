@@ -26,12 +26,18 @@ async function convertFromBHD(amount, toCurrency) {
     return amount * rate;
 }
 
-// BHD uses 3 decimal places, 2 for other currencies 
+// currencies that can be picked for entry or for displaying totals
+const SUPPORTED_CURRENCIES = ['BHD', 'USD', 'EUR', 'GBP', 'SAR', 'AED', 'KWD', 'EGP'];
+
+// BHD and KWD use 3 decimal places, 2 for other currencies
+const THREE_DECIMAL_CURRENCIES = ['BHD', 'KWD'];
+
 function decimalsFor(currency) {
-    return currency === 'BHD' ? 3 : 2;
+    return THREE_DECIMAL_CURRENCIES.includes(currency) ? 3 : 2;
 }
 
 module.exports = {
+    SUPPORTED_CURRENCIES,
     getExchangeRate,
     convertToBHD,
     convertFromBHD,

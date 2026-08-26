@@ -1,5 +1,5 @@
 <section class="filter-bar">
-    <form method="GET" action="/transactions">
+    <form method="GET" action="<%= action %>">
         <select name="category">
             <option value="">All Categories</option>
             <option value="food" <%= query.category==='food' ? 'selected' : '' %>>Food</option>
@@ -30,6 +30,6 @@
         <input type="month" name="month" value="<%= query.month || '' %>">
 
         <button type="submit">Filter</button>
-        <a href="/transactions" class="clear-link">Clear filters</a>
+        <a href="<%= action %>" class="clear-link">Clear filters</a>
     </form>
 </section>

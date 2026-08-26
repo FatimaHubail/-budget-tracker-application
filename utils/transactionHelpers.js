@@ -31,6 +31,32 @@ const getMonthRange = (monthString) => {
     return { start, end };
 };
 
+// function to check whether a submitted date is after today, comparing whole calendar days so "today" itself always passes
+const isFutureDate = (dateValue) => {
+    if (!dateValue) return false;
+    return moment(dateValue).isAfter(moment().endOf('day'));
+};
+
+// function to build a mongo filter from category/type/month query params, merged onto a base filter (e.g. by user or by group)
+const buildTransactionFilter = (baseFilter, query) => {
+    const filter = { ...baseFilter };
+
+    if (query.category) {
+        filter.category = query.category;
+    }
+
+    if (query.type) {
+        filter.type = query.type;
+    }
+
+    if (query.month) {
+        const { start, end } = getMonthRange(query.month);
+        filter.date = { $gte: start, $lte: end };
+    }
+
+    return filter;
+};
+
 // function to group into per category totals splitted by income/expense
 function groupTransactionsByCategory(transactions) {
     const incomeTotals = {};
@@ -96,6 +122,8 @@ function buildBreakdown(totals, grandTotal) {
 module.exports = {
     processCustomCategory,
     getMonthRange,
+    isFutureDate,
+    buildTransactionFilter,
     groupTransactionsByCategory,
     buildBreakdown
 };

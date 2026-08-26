@@ -5,6 +5,8 @@ const moment = require('moment');
 const {
     processCustomCategory,
     getMonthRange,
+    isFutureDate,
+    buildTransactionFilter,
     groupTransactionsByCategory,
     buildBreakdown
 } = require('../utils/transactionHelpers.js');
@@ -30,21 +32,7 @@ const index = async (req, res) => {
         balance = income - expense;
 
         // filtering transactions
-        const filter = { user: req.session.user._id };
-
-        if (req.query.category) {
-            filter.category = req.query.category;
-        }
-
-        if (req.query.type) {
-            filter.type = req.query.type;
-        }
-
-        if (req.query.month) {
-            const { start, end } = getMonthRange(req.query.month);
-            filter.date = { $gte: start, $lte: end };
-        }
-
+        const filter = buildTransactionFilter({ user: req.session.user._id }, req.query);
         const filteredTransactions = await Transaction.find(filter).sort({date: -1});
 
 
@@ -71,8 +59,13 @@ const create = async (req, res) => {
     try {
         const { title, description, amount, type, category, newCategory, date } = req.body;
 
+        // transactions can't be dated in the future
+        if (isFutureDate(date)) {
+            return res.redirect('/transactions/new');
+        }
+
         const customCategoryId = await processCustomCategory(category, newCategory, type, req.session.user._id);
-        
+
         await Transaction.create({
             title,
             description,
@@ -132,6 +125,12 @@ const update = async (req, res) => {
         }
 
         const { title, description, amount, type, category, newCategory, date } = req.body;
+
+        // transactions can't be dated in the future
+        if (isFutureDate(date)) {
+            return res.redirect(`/transactions/${req.params.id}/edit`);
+        }
+
         const customCategoryId = await processCustomCategory(category, newCategory, type, req.session.user._id);
 
         const payload = { title, description, amount, type, category, customCategory: customCategoryId, date }

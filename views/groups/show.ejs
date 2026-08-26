@@ -78,8 +78,17 @@
                         <% } %>
                 </div>
 
+                <!-- ===== Filters + Search ===== -->
+                <%- include('../partials/_filterBar.ejs', {query, action: `/groups/${group._id}`}) %>
+
                 <% if (transactions.length===0) { %>
-                    <p class="empty-state">No transactions in this group yet.</p>
+                    <p class="empty-state">
+                        <% if (query.category || query.type || query.month) { %>
+                            No transactions found. Try adjusting your filters.
+                            <% } else { %>
+                                No transactions in this group yet.
+                                <% } %>
+                    </p>
                     <% } else { %>
                         <table class="transaction-table">
                             <thead>

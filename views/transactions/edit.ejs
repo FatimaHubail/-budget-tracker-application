@@ -108,7 +108,7 @@
 
                 <label for="date">Date</label>
                 <input type="date" id="date" name="date" value="<%= transaction.date.toISOString().split('T')[0] %>"
-                    required>
+                    max="<%= new Date().toISOString().split('T')[0] %>" required>
 
                 <div class="form-actions">
                     <a href="/transactions/<%= transaction._id %>" class="btn-cancel">Cancel</a>

@@ -77,7 +77,8 @@
                         </div>
 
                         <label for="date">Date</label>
-                        <input type="date" id="date" name="date" required>
+                        <input type="date" id="date" name="date" max="<%= new Date().toISOString().split('T')[0] %>"
+                            required>
 
                         <div class="form-actions">
                             <a href="<%= group ? `/groups/${group._id}` : '/transactions' %>"

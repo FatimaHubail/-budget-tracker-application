@@ -8,6 +8,8 @@ const {sendInviteEmail} = require('../utils/mailer.js');
 const {
     processCustomCategory,
     getMonthRange,
+    isFutureDate,
+    buildTransactionFilter,
     groupTransactionsByCategory,
     buildBreakdown
 } = require('../utils/transactionHelpers.js');
@@ -90,13 +92,14 @@ const show = async (req, res) => {
 
         const userRole = membership.role;
 
-        // find all transactions for this group
-        const transactions = await Transaction.find({ group: group._id })
+        // find this group's transactions, filtered by category/type/month if requested
+        const filter = buildTransactionFilter({ group: group._id }, req.query);
+        const transactions = await Transaction.find(filter)
             .populate('customCategory')
             .populate('user')
             .sort({ date: -1 });
 
-        res.render('groups/show.ejs', { group, transactions, userRole });
+        res.render('groups/show.ejs', { group, transactions, userRole, query: req.query });
     } catch (error) {
         console.log(error);
         res.redirect('/groups');
@@ -244,6 +247,12 @@ const createTransaction = async (req, res) => {
         }
 
         const { title, description, amount, type, category, newCategory, date } = req.body;
+
+        // transactions can't be dated in the future
+        if (isFutureDate(date)) {
+            return res.redirect(`/groups/${group._id}/transactions/new`);
+        }
+
         const customCategoryId = await processCustomCategory(category, newCategory, type, req.session.user._id);
 
         await Transaction.create({
@@ -331,6 +340,12 @@ const updateTransaction = async (req, res) => {
         }
 
         const { title, description, amount, type, category, newCategory, date } = req.body;
+
+        // transactions can't be dated in the future
+        if (isFutureDate(date)) {
+            return res.redirect(`/groups/${group._id}/transactions/${req.params.transactionId}/edit`);
+        }
+
         const customCategoryId = await processCustomCategory(category, newCategory, type, req.session.user._id);
 
         const payload = { title, description, amount, type, category, customCategory: customCategoryId, date };

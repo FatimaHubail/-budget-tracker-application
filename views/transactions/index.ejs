@@ -39,7 +39,7 @@
                 </div>
 
                 <!-- ===== Filters + Search ===== -->
-                <%- include('../partials/_filterBar.ejs', {query}) %>
+                <%- include('../partials/_filterBar.ejs', {query, action: '/transactions'}) %>
     
                 <% if (filteredTransactions.length === 0) { %>
                     <p class="empty-state">

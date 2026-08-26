@@ -115,7 +115,7 @@
                             <span>
                                 <%= member.user.username %>
                             </span>
-                            <span class="member-role">
+                            <span class="member-role member-role-<%= member.role %>">
                                 <%= member.role.charAt(0).toUpperCase() + member.role.slice(1) %>
                             </span>
                         </li>

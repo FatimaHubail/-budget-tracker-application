@@ -6,11 +6,11 @@
   gap: 16px;
   flex-wrap: wrap;
   padding: 16px 32px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #6C5CE7 100%);
+  background: linear-gradient(135deg, var(--color-ink) 0%, var(--color-violet) 100%);
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 6px 20px rgba(60, 47, 196, 0.2);
+  box-shadow: 0 6px 20px rgba(43, 31, 107, 0.22);
 }
 
 .nav-brand a {
@@ -45,12 +45,12 @@
 }
 
 .nav-link.nav-link-signout {
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--color-primary-dark);
+  background: var(--color-peach);
+  color: var(--color-ink);
 }
 
 .nav-link.nav-link-signout:hover {
-  background: #fff;
+  background: var(--color-peach-dark);
 }
 
 /* ===== Footer ===== */

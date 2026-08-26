@@ -1,26 +1,51 @@
 /* Font from Google */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-/* ===== Palette (from design reference) ===== */
+/* ===== Palette (sampled from the design reference) ===== */
 :root {
-  --color-primary: #4F3FF0;
-  --color-primary-dark: #3C2FC4;
-  --color-primary-light: #ECEAFB;
+  /* Indigo family - the sidebar, primary actions */
+  --color-primary: #3E2E93;
+  --color-primary-dark: #2E2075;
+  --color-primary-light: #E8E5F8;
+  --color-ink: #2B1F6B;
 
-  --color-income: #4CC9F0;
-  --color-income-dark: #2FA9CF;
-  --color-expense: #FF7A6E;
-  --color-expense-dark: #E85B4F;
+  /* Violet - the chart bars and the balance chip */
+  --color-violet: #4B3CC4;
+  --color-violet-light: #6A5AD9;
 
-  --color-accent-peach: #FCE7C4;
-  --color-accent-peach-dark: #F3D49B;
+  /* Sky family - the blue wedge on the card, the Investment figures */
+  --color-sky: #35BEF2;
+  --color-sky-dark: #1B9FD4;
+  --color-sky-text: #0F7EA8;
+  --color-sky-tint: #E3F5FD;
 
-  --color-bg: #F3F1FB;
+  /* Coral family - the pink wedge, the spending bars, cancelled rows */
+  --color-coral: #F98A84;
+  --color-coral-dark: #E4665E;
+  --color-coral-text: #C7463D;
+  --color-coral-tint: #FDECEA;
+
+  /* Peach family - the payment-history rail on the right */
+  --color-peach: #FBE3C1;
+  --color-peach-dark: #EFC98A;
+  --color-cream: #FDF1DE;
+
+  /* Semantic aliases used by amounts and bars */
+  --color-income: var(--color-sky);
+  --color-income-dark: var(--color-sky-dark);
+  --color-income-text: var(--color-sky-text);
+  --color-expense: var(--color-coral);
+  --color-expense-dark: var(--color-coral-dark);
+  --color-expense-text: var(--color-coral-text);
+
+  /* Neutrals - the reference's canvas is grey, not lavender */
+  --color-bg: #EDECF2;
   --color-surface: #FFFFFF;
-  --color-border: #E7E4F6;
+  --color-surface-alt: #F7F7FB;
+  --color-border: #E4E3EC;
 
-  --color-text: #241E42;
-  --color-text-muted: #8A86A6;
+  --color-text: #1F1B3D;
+  --color-text-muted: #8E8DA3;
   --color-text-on-primary: #FFFFFF;
 
   --radius-sm: 8px;
@@ -28,8 +53,8 @@
   --radius-lg: 18px;
   --radius-pill: 999px;
 
-  --shadow-card: 0 10px 30px rgba(79, 63, 240, 0.08);
-  --shadow-card-hover: 0 16px 36px rgba(79, 63, 240, 0.14);
+  --shadow-card: 0 10px 30px rgba(43, 31, 107, 0.08);
+  --shadow-card-hover: 0 16px 36px rgba(43, 31, 107, 0.16);
 
   --content-max-width: 1100px;
 }
@@ -134,7 +159,7 @@ button[type='submit'] {
 button[type='submit'] {
   background: var(--color-primary);
   color: var(--color-text-on-primary);
-  box-shadow: 0 8px 20px rgba(79, 63, 240, 0.25);
+  box-shadow: 0 8px 20px rgba(62, 46, 147, 0.28);
 }
 
 .btn-add:hover,
@@ -151,14 +176,14 @@ button[type='submit']:hover {
 }
 
 .btn-cancel:hover {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+  background: var(--color-surface-alt);
+  color: var(--color-ink);
 }
 
 .btn-edit {
   background: var(--color-income);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(76, 201, 240, 0.3);
+  box-shadow: 0 8px 20px rgba(53, 190, 242, 0.35);
 }
 
 .btn-edit:hover {
@@ -169,7 +194,7 @@ button[type='submit']:hover {
 .btn-delete {
   background: var(--color-expense);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(255, 122, 110, 0.3);
+  box-shadow: 0 8px 20px rgba(249, 138, 132, 0.35);
 }
 
 .btn-delete:hover {
@@ -178,15 +203,15 @@ button[type='submit']:hover {
 }
 
 .btn-details {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+  background: var(--color-cream);
+  color: var(--color-ink);
   padding: 8px 16px;
   font-size: 0.82rem;
 }
 
 .btn-details:hover {
-  background: var(--color-primary);
-  color: #fff;
+  background: var(--color-peach);
+  color: var(--color-ink);
 }
 
 .delete-form,
@@ -238,7 +263,7 @@ select {
   padding: 12px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-bg);
+  background: var(--color-surface-alt);
   color: var(--color-text);
   font-size: 0.95rem;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -254,7 +279,7 @@ textarea:focus,
 select:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(79, 63, 240, 0.15);
+  box-shadow: 0 0 0 3px rgba(75, 60, 196, 0.18);
   background: var(--color-surface);
 }
 
@@ -272,7 +297,7 @@ select:focus {
   padding: 12px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-bg);
+  background: var(--color-surface-alt);
   font-weight: 500;
   color: var(--color-text);
   cursor: pointer;
@@ -298,7 +323,7 @@ select:focus {
 }
 
 .back-link:hover {
-  color: var(--color-primary);
+  color: var(--color-violet);
 }
 
 .form-subtitle {
@@ -307,7 +332,7 @@ select:focus {
 }
 
 .form-subtitle strong {
-  color: var(--color-primary);
+  color: var(--color-violet);
 }
 
 .form-page {
@@ -355,7 +380,7 @@ select:focus {
 }
 
 .card.balance {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #7B6FF5 100%);
+  background: linear-gradient(135deg, var(--color-ink) 0%, var(--color-violet) 100%);
   color: #fff;
 }
 
@@ -363,20 +388,30 @@ select:focus {
   color: rgba(255, 255, 255, 0.85);
 }
 
+.card.income {
+  background: var(--color-sky-tint);
+  border: 1px solid #CDEBF9;
+}
+
 .card.income h3 {
-  color: var(--color-text-muted);
+  color: var(--color-sky-text);
 }
 
 .card.income .amount {
-  color: var(--color-income-dark);
+  color: var(--color-sky-text);
+}
+
+.card.expense {
+  background: var(--color-coral-tint);
+  border: 1px solid #F8D5D1;
 }
 
 .card.expense h3 {
-  color: var(--color-text-muted);
+  color: var(--color-coral-text);
 }
 
 .card.expense .amount {
-  color: var(--color-expense-dark);
+  color: var(--color-coral-text);
 }
 
 .card .amount {
@@ -405,11 +440,13 @@ select:focus {
 .budget-item {
   padding: 14px 16px;
   border-radius: var(--radius-md);
-  background: var(--color-bg);
+  background: var(--color-surface-alt);
+  border-left: 3px solid var(--color-sky);
 }
 
 .budget-item.budget-exceeded {
-  background: #FFF0EE;
+  background: var(--color-coral-tint);
+  border-left-color: var(--color-coral);
 }
 
 .budget-label {
@@ -435,18 +472,18 @@ select:focus {
 }
 
 .bar-fill.income-fill {
-  background: linear-gradient(90deg, var(--color-income), var(--color-income-dark));
+  background: linear-gradient(90deg, var(--color-sky), var(--color-violet));
 }
 
 .bar-fill.expense-fill {
-  background: linear-gradient(90deg, var(--color-expense), var(--color-expense-dark));
+  background: linear-gradient(90deg, var(--color-peach-dark), var(--color-coral-dark));
 }
 
 .budget-warning {
   margin-top: 8px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--color-expense-dark);
+  color: var(--color-expense-text);
 }
 
 /* ===== Transaction list / table ===== */
@@ -487,17 +524,17 @@ select:focus {
 }
 
 .transaction-row:hover {
-  background: var(--color-primary-light);
+  background: var(--color-cream);
 }
 
 .amount-income {
-  color: var(--color-income-dark);
+  color: var(--color-income-text);
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .amount-expense {
-  color: var(--color-expense-dark);
+  color: var(--color-expense-text);
   font-weight: 600;
   text-transform: capitalize;
 }
@@ -532,7 +569,7 @@ select:focus {
 }
 
 .clear-link:hover {
-  color: var(--color-primary);
+  color: var(--color-violet);
 }
 
 /* ===== Groups list ===== */
@@ -546,6 +583,23 @@ select:focus {
   display: block;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   border-top: 4px solid var(--color-primary);
+}
+
+/* cycle the accent so a wall of group cards isn't one flat colour */
+.group-card:nth-child(5n + 2) {
+  border-top-color: var(--color-sky);
+}
+
+.group-card:nth-child(5n + 3) {
+  border-top-color: var(--color-coral);
+}
+
+.group-card:nth-child(5n + 4) {
+  border-top-color: var(--color-peach-dark);
+}
+
+.group-card:nth-child(5n + 5) {
+  border-top-color: var(--color-violet-light);
 }
 
 .group-card:hover {
@@ -606,7 +660,7 @@ select:focus {
   align-items: center;
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: var(--color-bg);
+  background: var(--color-surface-alt);
 }
 
 .member-role {
@@ -618,6 +672,16 @@ select:focus {
   background: var(--color-primary-light);
   padding: 4px 10px;
   border-radius: var(--radius-pill);
+}
+
+.member-role-editor {
+  color: var(--color-sky-text);
+  background: var(--color-sky-tint);
+}
+
+.member-role-viewer {
+  color: #96631C;
+  background: var(--color-cream);
 }
 
 /* ===== Transaction detail page ===== */
@@ -681,6 +745,8 @@ select:focus {
   gap: 14px;
   padding: 22px;
   margin-bottom: 22px;
+  background: var(--color-cream);
+  border: 1px solid var(--color-peach);
 }
 
 .month-selector {
@@ -723,6 +789,31 @@ select:focus {
   grid-column: 1 / 2;
 }
 
+/* a spend breakdown reads better when each category owns a hue */
+.breakdown-item:nth-child(6n + 1) .bar-fill {
+  background: linear-gradient(90deg, var(--color-violet), var(--color-primary));
+}
+
+.breakdown-item:nth-child(6n + 2) .bar-fill {
+  background: linear-gradient(90deg, var(--color-sky), var(--color-sky-dark));
+}
+
+.breakdown-item:nth-child(6n + 3) .bar-fill {
+  background: linear-gradient(90deg, var(--color-coral), var(--color-coral-dark));
+}
+
+.breakdown-item:nth-child(6n + 4) .bar-fill {
+  background: linear-gradient(90deg, var(--color-peach-dark), #D9A24F);
+}
+
+.breakdown-item:nth-child(6n + 5) .bar-fill {
+  background: linear-gradient(90deg, var(--color-violet-light), var(--color-violet));
+}
+
+.breakdown-item:nth-child(6n + 6) .bar-fill {
+  background: linear-gradient(90deg, #7FD4E8, var(--color-sky-dark));
+}
+
 .category-percentage {
   font-size: 0.82rem;
   font-weight: 600;
@@ -749,7 +840,7 @@ select:focus {
   width: 100%;
   padding: 32px;
   text-align: center;
-  border-top: 5px solid var(--color-accent-peach-dark);
+  border-top: 5px solid var(--color-peach-dark);
 }
 
 .invitation-card.expired-card {
@@ -805,7 +896,7 @@ select:focus {
 }
 
 .auth-switch a {
-  color: var(--color-primary);
+  color: var(--color-violet);
   font-weight: 600;
 }
 

@@ -52,6 +52,40 @@
                 </div>
             </div>
 
+            <!-- ===== Budget Status ===== -->
+            <section class="budget-section">
+                <div class="list-header">
+                    <h2>Budget</h2>
+                    <a href="/groups/<%= group._id %>/budgets/new" class="btn-add">+ Set Budget</a>
+                </div>
+            
+                <% if (budgets.length===0) { %>
+                    <p class="empty-state">No budget limits set yet.</p>
+                    <% } else { %>
+                        <ul class="budget-list">
+                            <% budgets.forEach(budget=> { %>
+                                <li class="budget-item <%= budget.exceeded ? 'budget-exceeded' : '' %>">
+                                    <div class="budget-label">
+                                        <span>
+                                            <%= budget.category ? budget.category.charAt(0).toUpperCase() + budget.category.slice(1)
+                                                : 'Overall' %>
+                                        </span>
+                                        <span>$<%= budget.spent.toFixed(2) %> / $<%= budget.limit.toFixed(2) %></span>
+                                    </div>
+                                    <div class="bar-track">
+                                        <div class="bar-fill <%= budget.exceeded ? 'expense-fill' : 'income-fill' %>"
+                                            style="width: <%= Math.min(budget.percentage, 100).toFixed(1) %>%;"></div>
+                                    </div>
+                                    <% if (budget.exceeded) { %>
+                                        <p class="budget-warning">Exceeded by $<%= (budget.spent - budget.limit).toFixed(2) %>
+                                        </p>
+                                        <% } %>
+                                </li>
+                                <% }) %>
+                        </ul>
+                        <% } %>
+            </section>
+
             <!-- ===== Members List ===== -->
             <section class="members-section">
                 <h2>Members (<%= group.members.length %>)</h2>

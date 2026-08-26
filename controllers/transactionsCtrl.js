@@ -2,6 +2,7 @@ const User = require('../models/user.js');
 const Transaction = require('../models/transaction.js');
 const OtherCategory = require('../models/otherCategory.js');
 const moment = require('moment');
+const { calculateBudgetStatus } = require('../utils/budgetHelpers.js');
 const {
     processCustomCategory,
     getMonthRange,
@@ -35,8 +36,9 @@ const index = async (req, res) => {
         const filter = buildTransactionFilter({ user: req.session.user._id }, req.query);
         const filteredTransactions = await Transaction.find(filter).sort({date: -1});
 
+        const budgets = await calculateBudgetStatus({ user: req.session.user._id }, moment().format('YYYY-MM'));
 
-        res.render('transactions/index.ejs', {filteredTransactions, income, expense, balance, query:req.query});
+        res.render('transactions/index.ejs', {filteredTransactions, income, expense, balance, query:req.query, budgets});
     } catch (error) {
         console.log(error);
         res.redirect('/');

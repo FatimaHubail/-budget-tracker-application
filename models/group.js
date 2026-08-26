@@ -25,11 +25,6 @@ const groupSchema = new mongoose.Schema({
         }
     }],
 
-    budgetLimit: {
-        type: Number,
-        min: 0,
-    }
-
 });
 
 const Group = mongoose.model('Group', groupSchema);

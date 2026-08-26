@@ -18,6 +18,7 @@ const {
     getGroupTransaction,
     canModifyTransaction
 } = require('../utils/groupHelpers.js');
+const { calculateBudgetStatus } = require('../utils/budgetHelpers.js');
 
 // -------------------------- Groups Controller --------------------------
 
@@ -98,8 +99,9 @@ const show = async (req, res) => {
             .populate('customCategory')
             .populate('user')
             .sort({ date: -1 });
+        const budgets = await calculateBudgetStatus({ group: group._id }, moment().format('YYYY-MM'));
 
-        res.render('groups/show.ejs', { group, transactions, userRole, query: req.query });
+        res.render('groups/show.ejs', { group, transactions, userRole, query: req.query, budgets });
     } catch (error) {
         console.log(error);
         res.redirect('/groups');

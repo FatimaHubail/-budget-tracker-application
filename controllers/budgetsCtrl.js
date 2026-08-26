@@ -1,5 +1,6 @@
 const Budget = require('../models/budget.js');
 const Group = require('../models/group.js');
+const OtherCategory = require('../models/otherCategory.js');
 
 // GET /budgets/new  (personal)  or  GET /groups/:id/budgets/new  (group)
 const newBudget = async (req, res) => {
@@ -16,7 +17,10 @@ const newBudget = async (req, res) => {
             }
         }
 
-        res.render('budgets/new.ejs', { group });
+        // budgets only ever track expenses, so only offer expense categories
+        const customCategories = await OtherCategory.find({ user: req.session.user._id, type: 'expense' });
+
+        res.render('budgets/new.ejs', { group, customCategories });
     } catch (error) {
         console.log(error);
         res.redirect('/');

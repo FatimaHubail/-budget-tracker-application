@@ -7,6 +7,12 @@ const express = require('express');
 
 const app = express();
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
+
 // Middleware
 const session = require('express-session');
 const MongoStore = require('connect-mongo').MongoStore;
@@ -38,8 +44,13 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.DATABASE_URI }),
+    cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: isProduction,
+    },
   })
 );
 app.use(addUserToViews);

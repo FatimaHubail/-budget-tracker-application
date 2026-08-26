@@ -1,8 +1,17 @@
 <nav id="navbar">
-  <% if (user) { %>
-  <a class="nav-link" href="/auth/sign-out">Sign Out</a>
-  <% } else { %>
-  <a class="nav-link" href="/auth/sign-up">Sign Up</a>
-  <a class="nav-link" href="/auth/sign-in">Sign In</a>
-  <% } %>
+  <div class="nav-brand">
+    <a href="<%= user ? '/transactions' : '/' %>">💰 BudgetTracker</a>
+  </div>
+
+  <div class="nav-links">
+    <% if (user) { %>
+    <a class="nav-link" href="/transactions">Dashboard</a>
+    <a class="nav-link" href="/groups">Groups</a>
+    <a class="nav-link" href="/transactions/summary">Summary</a>
+    <a class="nav-link nav-link-signout" href="/auth/sign-out">Sign Out</a>
+    <% } else { %>
+    <a class="nav-link" href="/auth/sign-up">Sign Up</a>
+    <a class="nav-link" href="/auth/sign-in">Sign In</a>
+    <% } %>
+  </div>
 </nav>

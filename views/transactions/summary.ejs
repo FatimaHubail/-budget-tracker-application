@@ -12,10 +12,22 @@
 
         <main class="summary-page">
 
-            <div class="summary-header">
-                <h1>Spend Breakdown</h1>
+            <a href="<%= group ? `/groups/${group._id}` : '/transactions' %>" class="back-link">&larr; Back</a>
 
-                <form method="GET" action="/transactions/summary" class="month-selector">
+            <div class="summary-header">
+                <div>
+                    <h1>Spend Breakdown</h1>
+                    <% if (group) { %>
+                        <p class="form-subtitle">
+                            <strong>
+                                <%= group.name %>
+                            </strong>
+                        </p>
+                        <% } %>
+                </div>
+
+                <form method="GET" action="<%= group ? `/groups/${group._id}/summary` : '/transactions/summary' %>"
+                    class="month-selector">
                     <input type="month" name="month" value="<%= month %>">
                     <button type="submit">View</button>
                 </form>

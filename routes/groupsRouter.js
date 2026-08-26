@@ -9,6 +9,7 @@ router.get('', groupsCtrl.index);
 router.get('/new', groupsCtrl.newGroup);
 router.post('', groupsCtrl.create);
 router.get('/:id', groupsCtrl.show);
+router.get('/:id/summary', groupsCtrl.summary);
 router.get('/:id/edit', groupsCtrl.edit);
 router.put('/:id', groupsCtrl.update);
 router.delete('/:id', groupsCtrl.deleteGroup);

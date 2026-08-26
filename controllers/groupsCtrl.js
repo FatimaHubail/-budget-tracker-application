@@ -7,11 +7,9 @@ const moment = require('moment');
 const {sendInviteEmail} = require('../utils/mailer.js');
 const {
     processCustomCategory,
-    getMonthRange,
     isFutureDate,
     buildTransactionFilter,
-    groupTransactionsByCategory,
-    buildBreakdown
+    buildSummary
 } = require('../utils/transactionHelpers.js');
 const {
     getGroupAndMembership,
@@ -449,36 +447,22 @@ const invite = async (req, res) => {
 
 const summary = async (req, res) => {
     try {
+        const result = await getGroupAndMembership(req.params.id, req.session.user._id);
+        if (!result) {
+            return res.redirect('/groups');
+        }
+        const { group } = result;
+
         // specify summary month
         const month = req.query.month || moment().format('YYYY-MM');
-        const { start, end } = getMonthRange(month);
 
-        // query to find transactions within that month chosen by user
-        const transactions = await Transaction.find({
-            user: req.session.user._id,
-            date: { $gte: start, $lte: end }
-        }).populate('customCategory');
+        const summaryData = await buildSummary({ group: group._id }, month);
 
-        // calc totals for each category + total income/expenses
-        const { incomeTotals, expenseTotals, totalIncome, totalExpense } = groupTransactionsByCategory(transactions);
-
-        // calculate percentage for each income category
-        const incomeBreakDown = buildBreakdown(incomeTotals, totalIncome);
-
-        // calculate percentage for each expense category
-        const expenseBreakDown = buildBreakdown(expenseTotals, totalExpense);
-
-        res.render('transactions/summary.ejs', {
-            month,
-            incomeBreakDown,
-            expenseBreakDown,
-            totalIncome,
-            totalExpense,
-        });
+        res.render('transactions/summary.ejs', { ...summaryData, group });
 
     } catch (error) {
         console.log(error);
-        res.redirect('/transactions');
+        res.redirect(`/groups/${req.params.id}`);
     }
 };
 

@@ -1,5 +1,6 @@
 const moment = require('moment');
 const OtherCategory = require('../models/otherCategory.js');
+const Transaction = require('../models/transaction.js');
 
 // function for processing and validating the custom category data during creation/updating
 const processCustomCategory = async (category, newCategory, type, userId) => {
@@ -119,11 +120,30 @@ function buildBreakdown(totals, grandTotal) {
     return breakdown;
 }
 
+// builds the full spend-breakdown summary for a scope (personal or group) for a given month
+// scopeFilter is either { user: userId } or { group: groupId }
+async function buildSummary(scopeFilter, month) {
+    const { start, end } = getMonthRange(month);
+
+    const transactions = await Transaction.find({
+        ...scopeFilter,
+        date: { $gte: start, $lte: end }
+    }).populate('customCategory');
+
+    const { incomeTotals, expenseTotals, totalIncome, totalExpense } = groupTransactionsByCategory(transactions);
+
+    const incomeBreakDown = buildBreakdown(incomeTotals, totalIncome);
+    const expenseBreakDown = buildBreakdown(expenseTotals, totalExpense);
+
+    return { month, incomeBreakDown, expenseBreakDown, totalIncome, totalExpense };
+}
+
 module.exports = {
     processCustomCategory,
     getMonthRange,
     isFutureDate,
     buildTransactionFilter,
     groupTransactionsByCategory,
-    buildBreakdown
+    buildBreakdown,
+    buildSummary
 };

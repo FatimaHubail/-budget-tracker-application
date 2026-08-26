@@ -5,11 +5,9 @@ const moment = require('moment');
 const { calculateBudgetStatus } = require('../utils/budgetHelpers.js');
 const {
     processCustomCategory,
-    getMonthRange,
     isFutureDate,
     buildTransactionFilter,
-    groupTransactionsByCategory,
-    buildBreakdown
+    buildSummary
 } = require('../utils/transactionHelpers.js');
 
 // index route (dashboard)
@@ -167,34 +165,14 @@ const summary = async (req, res) => {
     try {
         // specify summary month
         const month = req.query.month || moment().format('YYYY-MM');
-        const { start, end } = getMonthRange(month);
 
-        // query to find transactions within that month chosen by user
-        const transactions = await Transaction.find({
-            user: req.session.user._id,
-            date: { $gte: start, $lte: end }
-        }).populate('customCategory');
+        const summaryData = await buildSummary({ user: req.session.user._id }, month);
 
-        // calc totals for each category + total income/expenses
-        const { incomeTotals, expenseTotals, totalIncome, totalExpense } = groupTransactionsByCategory(transactions);
+        res.render('transactions/summary.ejs', { ...summaryData, group: null });
 
-        // calculate percentage for each income category
-        const incomeBreakDown = buildBreakdown(incomeTotals, totalIncome);
-
-        // calculate percentage for each expense category
-        const expenseBreakDown = buildBreakdown(expenseTotals, totalExpense);
-
-        res.render('transactions/summary.ejs', {
-            month,
-            incomeBreakDown,
-            expenseBreakDown,
-            totalIncome,
-            totalExpense,
-        });
-        
     } catch (error) {
         console.log(error);
-        res.redirect('/transactions');  
+        res.redirect('/transactions');
     }
 };
 

@@ -687,6 +687,29 @@ select:focus {
   min-width: 150px;
 }
 
+/* ===== Currency toggle ===== */
+.currency-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.currency-toggle label {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.currency-toggle select,
+.currency-toggle .dw-select {
+  width: auto;
+  min-width: 90px;
+}
+
 .radio-group {
   display: flex;
   gap: 10px;
@@ -877,6 +900,44 @@ select:focus {
 .bar-fill {
   height: 100%;
   border-radius: var(--radius-pill);
+  transform-origin: left;
+  animation: growBar 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes growBar {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* stagger bars in a list so they don't all grow in perfect unison */
+.budget-item:nth-child(2) .bar-fill,
+.breakdown-item:nth-child(2) .bar-fill {
+  animation-delay: 0.06s;
+}
+
+.budget-item:nth-child(3) .bar-fill,
+.breakdown-item:nth-child(3) .bar-fill {
+  animation-delay: 0.12s;
+}
+
+.budget-item:nth-child(4) .bar-fill,
+.breakdown-item:nth-child(4) .bar-fill {
+  animation-delay: 0.18s;
+}
+
+.budget-item:nth-child(5) .bar-fill,
+.breakdown-item:nth-child(5) .bar-fill {
+  animation-delay: 0.24s;
+}
+
+.budget-item:nth-child(n+6) .bar-fill,
+.breakdown-item:nth-child(n+6) .bar-fill {
+  animation-delay: 0.3s;
 }
 
 .bar-fill.income-fill {

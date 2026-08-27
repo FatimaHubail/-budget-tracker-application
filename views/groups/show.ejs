@@ -2,6 +2,8 @@
 <html lang="en">
 
 <head>
+    <script defer src="/js/datePicker.js"></script>
+    <script defer src="/js/customSelect.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/stylesheets/style.css">
@@ -29,26 +31,32 @@
                 </div>
 
                 <div class="group-actions">
-                    <a href="/groups/<%= group._id %>/summary" class="btn-add">View Summary</a>
+                    <div class="group-actions-primary">
+                        <a href="/groups/<%= group._id %>/summary" class="btn-secondary btn-sm">View Summary</a>
 
-                    <!-- every member can rename the group -->
-                    <a href="/groups/<%= group._id %>/edit" class="btn-add">Edit Group</a>
+                        <!-- every member can rename the group -->
+                        <a href="/groups/<%= group._id %>/edit" class="btn-secondary btn-sm">Edit Group</a>
 
-                    <% if (userRole==='admin' ) { %>
-                        <a href="/groups/<%= group._id %>/members/new" class="btn-add">+ Add Member</a>
+                        <% if (userRole==='admin' ) { %>
+                            <a href="/groups/<%= group._id %>/members/new" class="btn-add btn-sm">+ Add Member</a>
+                            <% } %>
+                    </div>
 
-                        <!-- only an admin can delete the group -->
-                        <form action="/groups/<%= group._id %>?_method=DELETE" method="POST"
-                            onsubmit="return confirm('Delete this group and all of its transactions?');">
-                            <button type="submit" class="btn-delete">Delete Group</button>
+                    <div class="group-actions-danger">
+                        <!-- any member, including the owner, can leave; ownership passes on automatically -->
+                        <form action="/groups/<%= group._id %>/leave?_method=DELETE" method="POST"
+                            onsubmit="return confirm('<%= group.owner._id.toString() === user._id ? 'Leave this group? Ownership will pass to the next member.' : 'Leave this group?' %>');">
+                            <button type="submit" class="btn-outline-delete btn-sm">Leave Group</button>
                         </form>
-                        <% } %>
 
-                            <!-- any member, including the owner, can leave; ownership passes on automatically -->
-                            <form action="/groups/<%= group._id %>/leave?_method=DELETE" method="POST"
-                                onsubmit="return confirm('<%= group.owner._id.toString() === user._id ? 'Leave this group? Ownership will pass to the next member.' : 'Leave this group?' %>');">
-                                <button type="submit" class="btn-delete">Leave Group</button>
+                        <% if (userRole==='admin' ) { %>
+                            <!-- only an admin can delete the group -->
+                            <form action="/groups/<%= group._id %>?_method=DELETE" method="POST"
+                                onsubmit="return confirm('Delete this group and all of its transactions?');">
+                                <button type="submit" class="btn-delete btn-sm">Delete Group</button>
                             </form>
+                            <% } %>
+                    </div>
                 </div>
             </div>
 

@@ -5,16 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/stylesheets/style.css" />
     <link rel="stylesheet" href="/stylesheets/partials.css" />
-    <title>Home Page</title>
+    <title>DinarWise</title>
   </head>
   <body>
-     <%- include('./partials/_navbar.ejs') %>
+    <main class="landing-page">
+      <section class="landing-hero">
+        <img src="/assets/dinarwise_logo.png" alt="DinarWise" class="landing-logo">
+        <h1>Take control of your dinars</h1>
+        <p class="landing-subtitle">
+          Log income and expenses, keep every category on budget, and manage shared
+          finances with family or friends, all in one place
+        </p>
+        <div class="landing-actions">
+          <a href="/auth/sign-up" class="btn-add">Get Started</a>
+          <a href="/auth/sign-in" class="btn-secondary landing-signin">Sign In</a>
+        </div>
+      </section>
 
-    <% if(user){ %>
-      <h1>Welcome to the app, <%= user.username %>!</h1>
-    <% }else{ %>
-      <h1>Welcome to the app!</h1>
-    <%}%>
+      <section class="landing-features">
+        <div class="landing-feature">
+          <span class="landing-feature-icon landing-feature-icon-sky">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
+              <path d="M16 13h2" />
+            </svg>
+          </span>
+          <h3>Track Every Transaction</h3>
+          <p>Log income and expenses, filter by category, and search your history in seconds.</p>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feature-icon landing-feature-icon-coral">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="6" y1="20" x2="6" y2="12" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="18" y1="20" x2="18" y2="9" />
+            </svg>
+          </span>
+          <h3>Stay On Budget</h3>
+          <p>Set monthly limits per category and get warned before you overspend.</p>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feature-icon landing-feature-icon-peach">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
+              <circle cx="10" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M17 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </span>
+          <h3>Share With Your Group</h3>
+          <p>Manage a family or business budget together with role-based access.</p>
+        </div>
+      </section>
+    </main>
 
     <%- include('./partials/_footer.ejs') %>
   </body>

@@ -69,6 +69,28 @@
   padding: 0;
 }
 
+/* ===== Animation ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 html {
   -webkit-font-smoothing: antialiased;
 }
@@ -132,6 +154,7 @@ main {
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: 28px 24px 48px;
+  animation: fadeInUp 0.35s ease both;
 }
 
 /* ===== Buttons ===== */
@@ -141,6 +164,8 @@ main {
 .btn-edit,
 .btn-delete,
 .btn-details,
+.btn-secondary,
+.btn-outline-delete,
 button[type='submit'] {
   display: inline-flex;
   align-items: center;
@@ -214,6 +239,30 @@ button[type='submit']:hover {
   color: var(--color-ink);
 }
 
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-surface-alt);
+  border-color: var(--color-violet-light);
+  transform: translateY(-1px);
+}
+
+.btn-add:active,
+.btn-save:active,
+.btn-cancel:active,
+.btn-edit:active,
+.btn-delete:active,
+.btn-details:active,
+.btn-secondary:active,
+.btn-outline-delete:active,
+button[type='submit']:active {
+  transform: scale(0.97);
+}
+
 .delete-form,
 .group-actions form {
   display: inline-flex;
@@ -236,6 +285,12 @@ button[type='submit']:hover {
 
 .card {
   padding: 22px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 /* ===== Forms ===== */
@@ -266,12 +321,55 @@ select {
   background: var(--color-surface-alt);
   color: var(--color-text);
   font-size: 0.95rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+input[type='text']:hover,
+input[type='email']:hover,
+input[type='password']:hover,
+input[type='number']:hover,
+input[type='date']:hover,
+input[type='month']:hover,
+textarea:hover,
+select:hover {
+  border-color: var(--color-violet-light);
 }
 
 textarea {
   min-height: 90px;
   resize: vertical;
+}
+
+/* ===== Select / date & month pickers ===== */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%232B1F6B' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 10px 6px;
+}
+
+input[type='date'],
+input[type='month'] {
+  cursor: pointer;
+  color-scheme: light;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='month']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.75;
+  filter: invert(15%) sepia(37%) saturate(3500%) hue-rotate(233deg) brightness(90%) contrast(101%);
+  transition: opacity 0.15s ease;
+}
+
+input[type='date']:hover::-webkit-calendar-picker-indicator,
+input[type='month']:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
 }
 
 input:focus,
@@ -281,6 +379,312 @@ select:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(75, 60, 196, 0.18);
   background: var(--color-surface);
+}
+
+/* ===== Custom date / month picker ===== */
+.dw-datepicker {
+  position: relative;
+  width: 100%;
+}
+
+.dw-datepicker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.dw-datepicker-trigger:hover {
+  border-color: var(--color-violet-light);
+}
+
+.dw-datepicker-trigger[aria-expanded='true'],
+.dw-datepicker-trigger:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(75, 60, 196, 0.18);
+  background: var(--color-surface);
+}
+
+.dw-datepicker-trigger svg {
+  flex-shrink: 0;
+  color: var(--color-violet);
+}
+
+.dw-datepicker-text.dw-datepicker-placeholder {
+  color: var(--color-text-muted);
+}
+
+.dw-datepicker-trigger.dw-datepicker-invalid {
+  border-color: var(--color-coral);
+  box-shadow: 0 0 0 3px rgba(249, 138, 132, 0.2);
+}
+
+.dw-calendar-popup {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+  width: 280px;
+  max-width: calc(100vw - 48px);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card-hover);
+  padding: 16px;
+  animation: fadeInUp 0.15s ease both;
+}
+
+.dw-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.dw-calendar-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.dw-calendar-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--color-violet);
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.dw-calendar-nav-btn:hover {
+  background: var(--color-primary-light);
+}
+
+.dw-calendar-grid {
+  display: grid;
+  gap: 4px;
+}
+
+.dw-calendar-grid-days {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.dw-calendar-grid-months {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.dw-calendar-weekday {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding-bottom: 4px;
+}
+
+.dw-calendar-day,
+.dw-calendar-month-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--color-text);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dw-calendar-day {
+  aspect-ratio: 1;
+}
+
+.dw-calendar-month-cell {
+  padding: 12px 0;
+  font-weight: 500;
+}
+
+.dw-calendar-day:hover:not(:disabled),
+.dw-calendar-month-cell:hover:not(:disabled) {
+  background: var(--color-cream);
+}
+
+.dw-calendar-day-outside {
+  color: var(--color-text-muted);
+}
+
+.dw-calendar-day-today {
+  border: 1px solid var(--color-violet);
+}
+
+.dw-calendar-day-selected {
+  background: var(--color-violet) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.dw-calendar-day-disabled {
+  color: var(--color-border);
+  cursor: not-allowed;
+}
+
+.filter-bar .dw-datepicker {
+  width: auto;
+  min-width: 170px;
+}
+
+.month-selector .dw-datepicker {
+  width: auto;
+}
+
+.month-selector .dw-datepicker-trigger {
+  min-width: 170px;
+}
+
+/* ===== Custom select dropdown ===== */
+.dw-select {
+  position: relative;
+  width: 100%;
+}
+
+.dw-select-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.dw-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.dw-select-trigger:hover {
+  border-color: var(--color-violet-light);
+}
+
+.dw-select-trigger[aria-expanded='true'],
+.dw-select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(75, 60, 196, 0.18);
+  background: var(--color-surface);
+}
+
+.dw-select-trigger svg {
+  flex-shrink: 0;
+  color: var(--color-violet);
+  transition: transform 0.15s ease;
+}
+
+.dw-select-trigger[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.dw-select-trigger:disabled,
+.dw-select-trigger.dw-select-trigger-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dw-select-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dw-select-popup {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card-hover);
+  padding: 6px;
+  animation: fadeInUp 0.15s ease both;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.dw-select-popup::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dw-select-popup::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dw-select-popup::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.dw-select-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  color: var(--color-text);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dw-select-option:hover:not(:disabled) {
+  background: var(--color-cream);
+}
+
+.dw-select-option-selected {
+  background: var(--color-violet) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.dw-select-option-disabled {
+  color: var(--color-border);
+  cursor: not-allowed;
+}
+
+.filter-bar .dw-select {
+  width: auto;
+  min-width: 150px;
 }
 
 .radio-group {
@@ -360,6 +764,10 @@ select:focus {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 20px;
+}
+
+.list-header .btn-add {
+  flex-shrink: 0;
 }
 
 .empty-state {
@@ -500,11 +908,46 @@ select:focus {
   white-space: nowrap;
 }
 
-.transaction-table thead,
-.transaction-table tbody {
+.transaction-table thead {
   display: table;
   width: 100%;
   table-layout: fixed;
+}
+
+/* cap the body at ~4 rows tall; anything beyond that scrolls */
+.transaction-table tbody {
+  display: block;
+  width: 100%;
+  max-height: 232px;
+  overflow-y: auto;
+}
+
+.transaction-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.transaction-table tbody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.transaction-table tbody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.transaction-table tbody::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.transaction-table tbody::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+.transaction-table tbody {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
 }
 
 .transaction-table th {
@@ -639,7 +1082,37 @@ select:focus {
 .group-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  gap: 16px;
+}
+
+.group-actions-primary,
+.group-actions-danger {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.group-actions-danger {
+  padding-left: 16px;
+  border-left: 1px solid var(--color-border);
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.82rem;
+}
+
+.btn-outline-delete {
+  background: var(--color-surface);
+  color: var(--color-coral-text);
+  border: 1px solid var(--color-coral);
+}
+
+.btn-outline-delete:hover {
+  background: var(--color-coral-tint);
+  transform: translateY(-1px);
 }
 
 .members-section {
@@ -685,9 +1158,15 @@ select:focus {
 }
 
 /* ===== Transaction detail page ===== */
+.detail-page {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
 .detail-card {
   padding: 28px;
   max-width: 560px;
+  animation: fadeInUp 0.4s ease 0.05s both;
 }
 
 .detail-header {
@@ -900,19 +1379,135 @@ select:focus {
   font-weight: 600;
 }
 
-/* ===== Home page ===== */
-.home-hero {
+/* ===== Landing page ===== */
+.landing-page {
+  padding-top: 40px;
+}
+
+.landing-hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 18px;
   text-align: center;
-  min-height: 60vh;
+  gap: 18px;
+  padding: 64px 32px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--color-ink) 0%, var(--color-violet) 100%);
+  color: #fff;
+  box-shadow: var(--shadow-card-hover);
 }
 
-.home-hero .btn-add {
+.landing-logo {
+  width: 220px;
+  animation: fadeInUp 0.6s ease both;
+}
+
+.landing-hero h1 {
+  color: #fff;
+  font-size: clamp(1.8rem, 1.3rem + 2vw, 2.6rem);
+  max-width: 620px;
+  animation: fadeInUp 0.6s ease 0.1s both;
+}
+
+.landing-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 520px;
+  font-size: 1.02rem;
+  animation: fadeInUp 0.6s ease 0.2s both;
+}
+
+.landing-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeInUp 0.6s ease 0.3s both;
+}
+
+.landing-actions .btn-add {
   padding: 12px 26px;
+}
+
+.landing-signin {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.35);
+  padding: 12px 26px;
+}
+
+.landing-signin:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.landing-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.landing-feature {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 28px 24px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: fadeInUp 0.5s ease both;
+}
+
+.landing-feature:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.landing-feature:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.landing-feature:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.landing-feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  margin-bottom: 14px;
+}
+
+.landing-feature-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.landing-feature-icon-sky {
+  background: var(--color-sky-tint);
+  color: var(--color-sky-text);
+}
+
+.landing-feature-icon-coral {
+  background: var(--color-coral-tint);
+  color: var(--color-coral-text);
+}
+
+.landing-feature-icon-peach {
+  background: var(--color-cream);
+  color: #96631C;
+}
+
+.landing-feature h3 {
+  margin-bottom: 8px;
+}
+
+.landing-feature p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
 }
 
 /* ===== Responsive ===== */
@@ -924,11 +1519,33 @@ select:focus {
   .detail-list {
     grid-template-columns: 120px 1fr;
   }
+
+  .landing-features {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
   main {
     padding: 20px 16px 40px;
+  }
+
+  .landing-hero {
+    padding: 40px 20px;
+  }
+
+  .landing-logo {
+    width: 160px;
+  }
+
+  .landing-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .landing-actions .btn-add,
+  .landing-signin {
+    width: 100%;
   }
 
   .balance-cards {
@@ -946,6 +1563,18 @@ select:focus {
 
   .group-actions {
     width: 100%;
+  }
+
+  .group-actions-primary,
+  .group-actions-danger {
+    width: 100%;
+  }
+
+  .group-actions-danger {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    padding-left: 0;
+    padding-top: 12px;
   }
 
   .group-actions a,
@@ -982,7 +1611,9 @@ select:focus {
   }
 
   .filter-bar select,
-  .filter-bar input {
+  .filter-bar input,
+  .filter-bar .dw-datepicker,
+  .filter-bar .dw-select {
     width: 100%;
   }
 
@@ -1000,7 +1631,8 @@ select:focus {
     width: 100%;
   }
 
-  .month-selector input {
+  .month-selector input,
+  .month-selector .dw-datepicker {
     flex: 1;
   }
 

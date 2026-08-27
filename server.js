@@ -38,6 +38,7 @@ const port = process.env.PORT ? process.env.PORT : '3000';
 
 // MIDDLEWARE
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/assets', express.static('assets'));
 // Middleware to parse URL-encoded data from forms
 app.use(express.urlencoded({ extended: false }));
 // Middleware for using HTTP verbs such as PUT or DELETE

@@ -47,9 +47,9 @@ const register = async (req, res) => {
       email: user.email,
       _id: user._id,
     };
-    // redirect to homepage
+    // redirect straight to the dashboard
     req.session.save(() => {
-      res.redirect('/');
+      res.redirect('/transactions');
     });
   } catch (err) {
     console.log(err);
@@ -83,7 +83,7 @@ const login = async (req, res) => {
   };
 
   req.session.save(() => {
-    res.redirect('/');
+    res.redirect('/transactions');
   });
 };
 

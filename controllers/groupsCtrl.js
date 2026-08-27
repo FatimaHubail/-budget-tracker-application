@@ -48,16 +48,10 @@ const newGroup = async (req, res) => {
 // route to add group
 const create = async (req, res) => {
     try {
-        const { name, budgetLimit } = req.body;
-
-        // validate budgetLimit if the user provided one
-        if (budgetLimit && (isNaN(budgetLimit) || Number(budgetLimit) < 0)) {
-            return res.redirect('/groups/new');
-        };
+        const { name } = req.body;
 
         const group = await Group.create({
             name,
-            budgetLimit,
             owner: req.session.user._id,
             members: [{
                 user: req.session.user._id,
@@ -138,10 +132,10 @@ const edit = async (req, res) => {
         if (!result) {
             return res.redirect('/groups');
         }
-        const { group, membership } = result;
+        const { group } = result;
 
-        // every member can open the form, but the view hides the budget field from non-admins
-        res.render('groups/edit.ejs', { group, userRole: membership.role });
+        // every member can rename the group
+        res.render('groups/edit.ejs', { group });
     } catch (error) {
         console.log(error);
         res.redirect('/groups');
@@ -155,30 +149,16 @@ const update = async (req, res) => {
         if (!result) {
             return res.redirect('/groups');
         }
-        const { group, membership } = result;
+        const { group } = result;
 
-        const { name, budgetLimit } = req.body;
+        const { name } = req.body;
 
         // any member can rename the group
         if (!name || !name.trim()) {
             return res.redirect(`/groups/${group._id}/edit`);
         }
 
-        const payload = { name: name.trim() };
-
-        // only admins can change the budget limit, everyone else keeps the current value
-        if (membership.role === 'admin') {
-            if (budgetLimit === undefined || budgetLimit === '') {
-                // admin cleared the field, so remove the limit
-                payload.budgetLimit = null;
-            } else if (isNaN(budgetLimit) || Number(budgetLimit) < 0) {
-                return res.redirect(`/groups/${group._id}/edit`);
-            } else {
-                payload.budgetLimit = Number(budgetLimit);
-            }
-        }
-
-        await Group.findByIdAndUpdate(group._id, payload, { runValidators: true });
+        await Group.findByIdAndUpdate(group._id, { name: name.trim() }, { runValidators: true });
 
         res.redirect(`/groups/${group._id}`);
 
@@ -443,23 +423,24 @@ const invite = async (req, res) => {
 
         const { email, role } = req.body;
 
-        // avoid duplicate invites
-        const existingInvite = await Invitation.findOne({
+        // reuse a still-pending invite
+        let invitation = await Invitation.findOne({
             group: group._id,
             email: email.toLowerCase(),
             status: 'pending',
         });
 
-        if (existingInvite) {
-            return res.redirect(`/groups/${group._id}`);
+        if (invitation) {
+            invitation.role = role;
+            await invitation.save();
+        } else {
+            invitation = await Invitation.create({
+                group: group._id,
+                email: email.toLowerCase(),
+                invitedBy: req.session.user._id,
+                role
+            });
         }
-
-        const invitation = await Invitation.create({
-            group: group._id,
-            email: email.toLowerCase(),
-            invitedBy: req.session.user._id,
-            role
-        });
 
         // invitation link, invitation id as token
         const inviteLink = `${process.env.BASE_URL}/invitations/${invitation._id}`;

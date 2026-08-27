@@ -78,7 +78,9 @@
             <section class="budget-section">
                 <div class="list-header">
                     <h2>Budget</h2>
-                    <a href="/groups/<%= group._id %>/budgets/new" class="btn-add">+ Set Budget</a>
+                    <% if (userRole==='admin' ) { %>
+                        <a href="/groups/<%= group._id %>/budgets/new" class="btn-add">+ Set Budget</a>
+                        <% } %>
                 </div>
 
                 <% if (budgets.length===0) { %>

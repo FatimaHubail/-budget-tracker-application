@@ -13,7 +13,9 @@
     <%- include('../partials/_navbar.ejs') %>
     
         <main class="dashboard">
-    
+
+            <h1 class="dashboard-welcome"><%= user.username %> returns. The receipts brace themselves!</h1>
+
             <!-- ===== Currency Toggle ===== -->
             <form method="GET" action="/transactions" class="currency-toggle">
                 <input type="hidden" name="category" value="<%= query.category || '' %>">

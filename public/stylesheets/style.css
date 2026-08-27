@@ -687,6 +687,10 @@ select:focus {
   min-width: 150px;
 }
 
+.dashboard-welcome {
+  margin-bottom: 18px;
+}
+
 /* ===== Currency toggle ===== */
 .currency-toggle {
   display: flex;

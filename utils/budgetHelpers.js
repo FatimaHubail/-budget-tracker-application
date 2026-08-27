@@ -9,7 +9,7 @@ async function calculateBudgetStatus(scopeFilter, month) {
     const { start, end } = getMonthRange(month);
 
     // get every budget limit set for this scope
-    const budgets = await Budget.find(scopeFilter);
+    const budgets = await Budget.find(scopeFilter).populate('customCategory');
 
     const results = [];
 
@@ -27,6 +27,12 @@ async function calculateBudgetStatus(scopeFilter, month) {
             transactionFilter.category = budget.category;
         }
 
+        // a budget on one specific custom category also needs to match its id,
+        // since every custom category shares category: 'other' on the transaction itself
+        if (budget.customCategory) {
+            transactionFilter.customCategory = budget.customCategory._id;
+        }
+
         const transactions = await Transaction.find(transactionFilter);
 
         let spent = 0;
@@ -38,7 +44,8 @@ async function calculateBudgetStatus(scopeFilter, month) {
 
         results.push({
             id: budget._id,
-            category: budget.category || null, // null = overall limit
+            // null = overall limit; a custom category displays its own name instead of "other"
+            category: budget.customCategory ? budget.customCategory.name : (budget.category || null),
             limit: budget.monthlyLimit,
             spent,
             percentage,

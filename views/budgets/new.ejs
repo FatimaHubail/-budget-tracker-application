@@ -42,7 +42,7 @@
                             <option value="subscriptions">Subscriptions</option>
 
                             <% customCategories.forEach(cat=> { %>
-                                <option value="<%= cat.name %>">
+                                <option value="other:<%= cat._id %>">
                                     <%= cat.name.charAt(0).toUpperCase() + cat.name.slice(1) %>
                                 </option>
                                 <% }) %>

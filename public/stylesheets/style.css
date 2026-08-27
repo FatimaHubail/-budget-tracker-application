@@ -955,6 +955,12 @@ select:focus {
   color: var(--color-expense-text);
 }
 
+.budget-item-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
 /* ===== Transaction list / table ===== */
 .transaction-list {
   padding: 22px;
@@ -1160,7 +1166,8 @@ select:focus {
   border-left: 1px solid var(--color-border);
 }
 
-.btn-sm {
+.btn-sm,
+button[type='submit'].btn-sm {
   padding: 8px 16px;
   font-size: 0.82rem;
 }

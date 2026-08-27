@@ -101,6 +101,8 @@ const show = async (req, res) => {
 
         const budgets = await calculateBudgetStatus({ group: group._id }, moment().format('YYYY-MM'));
 
+        const customCategories = await OtherCategory.find({ user: req.session.user._id });
+
         // ===== display currency conversion =====
         const displayCurrency = req.query.displayCurrency || 'BHD';
 
@@ -120,7 +122,8 @@ const show = async (req, res) => {
             budgets,
             user: req.session.user,
             displayCurrency,
-            decimals: decimalsFor(displayCurrency)
+            decimals: decimalsFor(displayCurrency),
+            customCategories
         });
     } catch (error) {
         console.log(error);

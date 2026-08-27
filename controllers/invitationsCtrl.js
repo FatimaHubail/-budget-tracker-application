@@ -14,7 +14,7 @@ const show = async (req, res) => {
         // must be logged in to accept/decline, send them to login, then bring them back after
         if (!req.session.user) {
             req.session.returnTo = `/invitations/${invitation._id}`;
-            return res.redirect('/auth/login');
+            return res.redirect('/auth/sign-in');
         }
 
         res.render('invitations/show.ejs', { invitation });
@@ -34,8 +34,8 @@ const accept = async (req, res) => {
         }
 
         // logged in user's email matches who this invite was actually sent to
-        if (invitation.email !== req.session.user._id) {
-            return res.render('invitations/expired.ejs'); 
+        if (invitation.email !== req.session.user.email) {
+            return res.render('invitations/expired.ejs');
         }
 
         const group = await Group.findById(invitation.group);

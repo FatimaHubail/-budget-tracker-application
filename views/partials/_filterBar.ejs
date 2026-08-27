@@ -19,6 +19,11 @@
             <option value="gift" <%= query.category==='gift' ? 'selected' : '' %>>Gift</option>
             <option value="investment" <%= query.category==='investment' ? 'selected' : '' %>>Investment</option>
             <option value="other" <%= query.category==='other' ? 'selected' : '' %>>Other</option>
+            <% customCategories.forEach(cat => { %>
+                <option value="other:<%= cat._id %>" <%= query.category==='other:' + cat._id ? 'selected' : '' %>>
+                    <%= cat.name.charAt(0).toUpperCase() + cat.name.slice(1) %>
+                </option>
+            <% }) %>
         </select>
 
         <select name="type">

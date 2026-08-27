@@ -47,9 +47,13 @@ const register = async (req, res) => {
       email: user.email,
       _id: user._id,
     };
-    // redirect straight to the dashboard
+
+    // redirect straight to the dashboard, unless they arrived here from an invite link
+    const redirectTo = req.session.returnTo || '/transactions';
+    delete req.session.returnTo;
+
     req.session.save(() => {
-      res.redirect('/transactions');
+      res.redirect(redirectTo);
     });
   } catch (err) {
     console.log(err);
@@ -78,12 +82,16 @@ const login = async (req, res) => {
   // Avoid storing the password, even in hashed format, in the session
   // If there is other data you want to save to `req.session.user`, do so here!
   req.session.user = {
+    username: userInDatabase.username,
     email: userInDatabase.email,
     _id: userInDatabase._id,
   };
 
+  const redirectTo = req.session.returnTo || '/transactions';
+  delete req.session.returnTo;
+
   req.session.save(() => {
-    res.redirect('/transactions');
+    res.redirect(redirectTo);
   });
 };
 

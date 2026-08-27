@@ -7,6 +7,8 @@ const { convertToBHD, convertFromBHD, decimalsFor, getExchangeRate } = require('
 const {
     processCustomCategory,
     isFutureDate,
+    getMonthRange,
+    parseCategoryFilter,
     buildTransactionFilter,
     buildSummary
 } = require('../utils/transactionHelpers.js');
@@ -18,7 +20,7 @@ const index = async (req, res) => {
 
         // build the filter object for the displayed list
         const filter = { user: req.session.user._id };
-        if (category) filter.category = category;
+        if (category) Object.assign(filter, parseCategoryFilter(category));
         if (type) filter.type = type;
         if (search) filter.title = { $regex: search, $options: 'i' };
 
@@ -27,7 +29,9 @@ const index = async (req, res) => {
             filter.date = { $gte: start, $lte: end };
         }
 
-        const transactions = await Transaction.find(filter).sort({ date: -1 });
+        const transactions = await Transaction.find(filter).populate('customCategory').sort({ date: -1 });
+
+        const customCategories = await OtherCategory.find({ user: req.session.user._id });
 
         // unfiltered, all user's transactions, used for totals
         const allTransactions = await Transaction.find({ user: req.session.user._id });
@@ -75,7 +79,8 @@ const index = async (req, res) => {
             query: req.query,
             budgets,
             displayCurrency,
-            decimals: decimalsFor(displayCurrency)
+            decimals: decimalsFor(displayCurrency),
+            customCategories
         });
     } catch (error) {
         console.log(error);

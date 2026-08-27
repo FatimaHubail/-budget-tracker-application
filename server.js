@@ -64,14 +64,14 @@ app.use(addUserToViews);
 app.use('', pagesRouter);
 app.use('/auth', authRouter); 
 app.use('/invitations', invitationsRouter);
-app.use('/budgets', budgetsRouter); // personal
-app.use('/groups/:id/budgets', budgetsRouter);  // Group
 
 // Customer middleware
 app.use(isSignedIn);
 
 app.use('/transactions', transactionsRouter);
 app.use('/groups', groupsRouter);
+app.use('/budgets', budgetsRouter); // personal
+app.use('/groups/:id/budgets', budgetsRouter);  // Group
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);

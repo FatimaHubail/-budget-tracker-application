@@ -38,12 +38,24 @@ const isFutureDate = (dateValue) => {
     return moment(dateValue).isAfter(moment().endOf('day'));
 };
 
+// custom categories all share category: 'other' in the DB, so filtering by one specific
+// custom category needs its id too; the filter bar encodes that as "other:<customCategoryId>"
+const parseCategoryFilter = (categoryParam) => {
+    if (!categoryParam) return {};
+
+    if (categoryParam.startsWith('other:')) {
+        return { category: 'other', customCategory: categoryParam.slice('other:'.length) };
+    }
+
+    return { category: categoryParam };
+};
+
 // function to build a mongo filter from category/type/month query params, merged onto a base filter (e.g. by user or by group)
 const buildTransactionFilter = (baseFilter, query) => {
     const filter = { ...baseFilter };
 
     if (query.category) {
-        filter.category = query.category;
+        Object.assign(filter, parseCategoryFilter(query.category));
     }
 
     if (query.type) {
@@ -142,6 +154,7 @@ module.exports = {
     processCustomCategory,
     getMonthRange,
     isFutureDate,
+    parseCategoryFilter,
     buildTransactionFilter,
     groupTransactionsByCategory,
     buildBreakdown,

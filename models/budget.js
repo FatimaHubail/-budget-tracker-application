@@ -15,6 +15,12 @@ const budgetSchema = new mongoose.Schema({
         type: String
     },
 
+    // set alongside category: 'other' when this budget targets one specific custom category
+    customCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'OtherCategory'
+    },
+
     monthlyLimit: {
         type: Number,
         min: 0,

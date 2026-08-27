@@ -73,6 +73,6 @@ app.use('/groups', groupsRouter);
 app.use('/budgets', budgetsRouter); // personal
 app.use('/groups/:id/budgets', budgetsRouter);  // Group
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`The express app is ready on port ${port}!`);
 });
